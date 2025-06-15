@@ -100,4 +100,58 @@ public class Registers {
     public void decrementPC() {
         this.pc = (pc - 1) & 0xffff;
     }
+
+    public void setRegister(String name, int value) {
+        switch (name.toUpperCase()) {
+            case "A":
+                setA(value);
+                break;
+            case "B":
+                setB(value);
+                break;
+            case "C":
+                setC(value);
+                break;
+            case "D":
+                setD(value);
+                break;
+            case "E":
+                setE(value);
+                break;
+            case "F":
+                setF(value);
+                break;
+            case "H":
+                setH(value);
+                break;
+            case "L":
+                setL(value);
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown register: " + name);
+        }
+    }
+
+    public int getRegister(String name) {
+        switch (name.toUpperCase()) {
+            case "A":
+                return getA();
+            case "B":
+                return getB();
+            case "C":
+                return getC();
+            case "D":
+                return getD();
+            case "E":
+                return getE();
+            case "F":
+                return getF();
+            case "H":
+                return getH();
+            case "L":
+                return getL();
+            default:
+                throw new IllegalArgumentException("Unknown register: " + name);
+        }
+    }
 }

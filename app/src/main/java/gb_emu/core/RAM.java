@@ -12,11 +12,11 @@ public class RAM {
         }
     }
 
-    public void writeMem(int position, int value) {
+    public void write(int position, int value) {
         mem[position] = value;
     }
 
-    public int readMem(int position) {
+    public int read(int position) {
         return mem[position];
     }
 
