@@ -6,7 +6,7 @@
  */
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
+    java
     application
 }
 
@@ -23,6 +23,10 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    // SLF4J
+    implementation("org.slf4j:slf4j-api:2.0.7")
+    implementation("ch.qos.logback:logback-classic:1.4.8")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
