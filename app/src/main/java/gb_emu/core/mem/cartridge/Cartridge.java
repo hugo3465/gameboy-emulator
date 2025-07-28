@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class Cartridge implements Serializable{
-    private byte[] romData;
+public class Cartridge implements Serializable {
+    private byte[] romData; // from 0x0000 to 0x7FFF
 
     public Cartridge(String romPath) {
         this.romData = loadFile(romPath);
@@ -157,4 +157,20 @@ public class Cartridge implements Serializable{
                 throw new IllegalArgumentException("Illegal ram size, received " + ramSizeCode + " code");
         }
     }
+
+    public int read(int address) {
+        if (address >= 0x0000 && address <= 0x7FFF) {
+            return Byte.toUnsignedInt(romData[address]);
+        }
+        return 0xFF;
+    }
+
+    public void write(int address, int value) {
+        // ROM_ONLY does nothing for write operatoins
+    }
+
+    public byte[] getRomData() {
+        return romData;
+    }
+
 }
