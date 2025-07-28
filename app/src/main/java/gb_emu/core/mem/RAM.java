@@ -1,4 +1,4 @@
-package gb_emu.core;
+package gb_emu.core.mem;
 
 public class RAM {
     private int RAM_CAPACITY = 32 * 1024;

@@ -2,10 +2,10 @@ package gb_emu.core.cpu;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import gb_emu.core.RAM;
+import gb_emu.core.mem.RAM;
+
 
 public class InstructionsMap {
     private RAM ram;

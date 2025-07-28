@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import gb_emu.core.cpu.InstructionsMap;
 import gb_emu.core.cpu.Operand;
 import gb_emu.core.cpu.Registers;
+import gb_emu.core.mem.RAM;
 
 class InstructionsMapTest {
 
@@ -20,7 +21,7 @@ class InstructionsMapTest {
 
     @BeforeEach
     void setup() {
-        ram = new RAM(); // Memória com espaço de 16 bits
+        ram = new RAM();
         registers = new Registers();
         instructionsMap = new InstructionsMap(ram, registers);
     }
@@ -38,7 +39,7 @@ class InstructionsMapTest {
 
     @Test
     void testLD_RegisterToRegister() {
-        // Primeiro coloca valor em C
+        // First put the C value
         registers.setC(99);
 
         // LD B, C

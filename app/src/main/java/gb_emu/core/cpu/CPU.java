@@ -5,7 +5,7 @@ import java.io.Serializable;
 import gb_emu.core.GameBoy;
 
 
-public class CPU implements Serializable{
+public class CPU implements Serializable {
     private GameBoy gb;
     private Registers registers;
 
