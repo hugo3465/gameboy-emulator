@@ -93,6 +93,33 @@ public class Registers {
         this.pc = pc;
     }
 
+    public int getBC() {
+        return (b << 8) | c;
+    }
+
+    public void setBC(int value) {
+        b = (value >> 8) & 0xFF;
+        c = value & 0xFF;
+    }
+
+    public int getDE() {
+        return (d << 8) | e;
+    }
+
+    public void setDE(int value) {
+        d = (value >> 8) & 0xFF;
+        e = value & 0xFF;
+    }
+
+    public int getHL() {
+        return (h << 8) | l;
+    }
+
+    public void setHL(int value) {
+        h = (value >> 8) & 0xFF;
+        l = value & 0xFF;
+    }
+
     public void incrementPC() {
         this.pc = (pc + 1) & 0xffff; // ensure 16 bit
     }
@@ -127,6 +154,12 @@ public class Registers {
             case "L":
                 setL(value);
                 break;
+            case "BC":
+                setBC(value);
+            case "DE":
+                setDE(value);
+            case "HL":
+                setHL(value);
             default:
                 throw new IllegalArgumentException("Unknown register: " + name);
         }
@@ -150,6 +183,12 @@ public class Registers {
                 return getH();
             case "L":
                 return getL();
+            case "BC":
+                return getBC();
+            case "DE":
+                return getDE();
+            case "HL":
+                return getHL();
             default:
                 throw new IllegalArgumentException("Unknown register: " + name);
         }
