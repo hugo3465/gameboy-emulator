@@ -1,9 +1,8 @@
-package gb_emu.core.cpu;
+package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
-import gb_emu.core.cpu.instructions.ArithmeticInstructionsMap;
-import gb_emu.core.cpu.instructions.LoadInstructionsMap;
+import gb_emu.core.cpu.Registers;
 import gb_emu.core.mem.MMU;
 import gb_emu.core.mem.RAM;
 

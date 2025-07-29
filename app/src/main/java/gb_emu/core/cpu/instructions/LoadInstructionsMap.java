@@ -190,7 +190,7 @@ public class LoadInstructionsMap implements InstructionSet {
             int value = readImmediate16();
             registers.setBC(value);
         });
-        
+
         functions.put(0x08, () -> { // LD (a16), SP
             int address = readImmediate16();
             int sp = registers.getSP();
@@ -212,8 +212,6 @@ public class LoadInstructionsMap implements InstructionSet {
             int value = readImmediate16();
             registers.setSP(value);
         });
-
-        
 
         functions.put(0xF8, () -> { // LD HL, SP+r8 (signed offset)
             int offset = (byte) readImmediate8(); // signed 8-bit

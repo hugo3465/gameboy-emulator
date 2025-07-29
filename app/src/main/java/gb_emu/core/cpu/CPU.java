@@ -3,6 +3,7 @@ package gb_emu.core.cpu;
 import java.io.Serializable;
 
 import gb_emu.core.GameBoy;
+import gb_emu.core.cpu.instructions.InstructionsMap;
 import gb_emu.core.mem.MMU;
 
 public class CPU implements Serializable {
