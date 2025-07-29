@@ -6,7 +6,7 @@ import gb_emu.core.mem.cartridge.Cartridge;
 /**
  * MMU serves as a mediator between the CPU and the memmory.
  * So the CPU does not have to know the origin of the memmory, that could be
- * from: RAM, VRAM, Cartridge or I/O Registers
+ * from: WRAM, HRAM, OAM, VRAM, Cartridge or I/O Registers
  */
 public class MMU {
     private static final int WORK_RAM_LENGHT = 0x2000; // 8KB
