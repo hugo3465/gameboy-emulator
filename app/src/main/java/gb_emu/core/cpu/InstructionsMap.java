@@ -12,7 +12,7 @@ public class InstructionsMap {
 
     public InstructionsMap(MMU mmu, RAM ram, Registers registers) {
         // register all functions
-        new LoadInstructionsMap(registers, ram, mmu).registerAll(functions);
+        new LoadInstructionsMap(registers, mmu).registerAll(functions);
         new ArithmeticInstructionsMap(registers, ram, mmu).registerAll(functions);
     }
 

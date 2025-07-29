@@ -8,12 +8,10 @@ import gb_emu.core.mem.RAM;
 
 public class LoadInstructionsMap implements InstructionSet {
     private Registers registers;
-    private RAM ram;
     private MMU mmu;
 
-    public LoadInstructionsMap(Registers registers, RAM ram, MMU mmu) {
+    public LoadInstructionsMap(Registers registers, MMU mmu) {
         this.registers = registers;
-        this.ram = ram;
         this.mmu = mmu;
     }
 
@@ -30,7 +28,7 @@ public class LoadInstructionsMap implements InstructionSet {
 
         functions.put(0x02, () -> { // LD (BC), A
             int address = registers.getBC();
-            ram.write(address, registers.getA());
+            mmu.write(address, registers.getA());
         });
 
         functions.put(0x06, () -> { // LD B, d8
@@ -43,7 +41,7 @@ public class LoadInstructionsMap implements InstructionSet {
 
         functions.put(0x12, () -> { // LD (DE), A
             int address = registers.getDE();
-            ram.write(address, registers.getA());
+            mmu.write(address, registers.getA());
         });
 
         functions.put(0x16, () -> { // LD D, d8
@@ -52,7 +50,7 @@ public class LoadInstructionsMap implements InstructionSet {
 
         functions.put(0x1A, () -> { // LD A, (DE)
             int address = registers.getDE();
-            int value = ram.read(address);
+            int value = mmu.read(address);
             registers.setA(value);
         });
 
@@ -62,7 +60,7 @@ public class LoadInstructionsMap implements InstructionSet {
 
         functions.put(0x22, () -> { // LD (HL+), A
             int address = registers.getHL();
-            ram.write(address, registers.getA());
+            mmu.write(address, registers.getA());
             registers.setHL((address + 1) & 0xFFFF);
         });
 
@@ -71,7 +69,7 @@ public class LoadInstructionsMap implements InstructionSet {
         });
 
         functions.put(0x2A, () -> { // LD A, (HL+)
-            int value = ram.read(registers.getHL());
+            int value = mmu.read(registers.getHL());
             registers.setA(value);
             registers.setHL((registers.getHL() + 1) & 0xFFFF);
         });
@@ -82,16 +80,16 @@ public class LoadInstructionsMap implements InstructionSet {
 
         functions.put(0x32, () -> { // LD (HL-), A
             int address = registers.getHL();
-            ram.write(address, registers.getA());
+            mmu.write(address, registers.getA());
             registers.setHL((address - 1) & 0xFFFF);
         });
 
         functions.put(0x36, () -> { // LD (HL), d8
-            ram.write(registers.getHL(), readImmediate8());
+            mmu.write(registers.getHL(), readImmediate8());
         });
 
         functions.put(0x3A, () -> { // LD A, (HL-)
-            int value = ram.read(registers.getHL());
+            int value = mmu.read(registers.getHL());
             registers.setA(value);
             registers.setHL((registers.getHL() - 1) & 0xFFFF);
         });
