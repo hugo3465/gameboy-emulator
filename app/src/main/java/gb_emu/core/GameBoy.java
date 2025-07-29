@@ -1,6 +1,7 @@
 package gb_emu.core;
 
 import gb_emu.core.cpu.CPU;
+import gb_emu.core.gpu.GPU;
 import gb_emu.core.mem.MMU;
 import gb_emu.core.mem.RAM;
 import gb_emu.core.mem.cartridge.Cartridge;
@@ -10,11 +11,12 @@ public class GameBoy {
     private Cartridge cartridge;
     private RAM ram;
     private MMU mmu;
+    private GPU gpu;
 
     public GameBoy(Cartridge cartridge) {
         this.cartridge = cartridge;
-        this.ram = new RAM();
-        this.mmu = new MMU(cartridge);
+        this.gpu = new GPU();
+        this.mmu = new MMU(cartridge, gpu);
         this.cpu = new CPU(this, mmu);
     }
 

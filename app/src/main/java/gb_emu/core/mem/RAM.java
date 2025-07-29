@@ -1,23 +1,28 @@
 package gb_emu.core.mem;
 
-public class RAM {
-    private int RAM_CAPACITY = 32 * 1024;
-    private int RAM_MAX_VALUE = 255;
+import java.io.Serializable;
 
-    private int[] mem = new int[RAM_CAPACITY];
+public class RAM implements Serializable {
+    private int[] mem;
+    private int length;
+    private int offset;
 
-    public RAM() {
-        for(int i = 0; i < mem.length; i++) {
-            mem[i] = (int) (Math.random() * RAM_MAX_VALUE); 
+    public RAM(int length, int offset) {
+        this.mem = new int[length];
+        this.length = length;
+        this.offset = offset;
+    }
+
+    public void write(int address, int value) {
+        mem[address - offset] = value;
+    }
+
+    public int read(int address) {
+        int index = address - offset;
+        if (index < 0 || index >= mem.length) {
+            throw new IndexOutOfBoundsException("Address: " + address);
         }
-    }
-
-    public void write(int position, int value) {
-        mem[position] = value;
-    }
-
-    public int read(int position) {
-        return mem[position];
+        return mem[index];
     }
 
 }
