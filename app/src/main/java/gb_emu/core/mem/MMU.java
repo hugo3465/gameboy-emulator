@@ -12,8 +12,8 @@ public class MMU {
     
     // Not implemented
     // private Registers registers; // acho que não coloquei os registers certos, não são de IO estes
-    // private byte[] wram = new byte[8 * 1024];   // WRAM 8 KiB
-    // private byte[] hram = new byte[127];        // HRAM
+    private byte[] wram = new byte[8 * 1024];   // WRAM 8 KiB
+    private byte[] hram = new byte[127];        // HRAM
 
     public MMU(Cartridge cartridge) {
         this.cartridge = cartridge;
@@ -28,11 +28,11 @@ public class MMU {
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             return cartridge.read(address); // RAM externa
         } else if (address >= 0xC000 && address <= 0xDFFF) {
-            // return Byte.toUnsignedInt(wram[address - 0xC000]);
+            return Byte.toUnsignedInt(wram[address - 0xC000]);
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             // Not implemented
             // Echo RAM
-            // return Byte.toUnsignedInt(wram[address - 0xE000]);
+            return Byte.toUnsignedInt(wram[address - 0xE000]);
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             // not implemented
             // return gpu.readOAM(address - 0xFE00);
@@ -41,7 +41,7 @@ public class MMU {
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             // not implemented
             // High RAM
-            // return Byte.toUnsignedInt(hram[address - 0xFF80]);
+            return Byte.toUnsignedInt(hram[address - 0xFF80]);
         } else if (address == 0xFFFF) {
             return Byte.toUnsignedInt(interruptEnable);
         }
@@ -60,16 +60,16 @@ public class MMU {
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             cartridge.write(address, value);
         } else if (address >= 0xC000 && address <= 0xDFFF) {
-            // wram[address - 0xC000] = (byte) value;
+            wram[address - 0xC000] = (byte) value;
         } else if (address >= 0xE000 && address <= 0xFDFF) {
-            // wram[address - 0xE000] = (byte) value;
+            wram[address - 0xE000] = (byte) value;
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             // gpu.writeOAM(address - 0xFE00, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // registers.write(address, value);
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             // not implemented
-            // hram[address - 0xFF80] = (byte) value;
+            hram[address - 0xFF80] = (byte) value;
         } else if (address == 0xFFFF) {
             interruptEnable = (byte) value;
         }

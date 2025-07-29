@@ -6,11 +6,19 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Cartridge implements Serializable {
+    public static final Logger LOGGER = LoggerFactory.getLogger(Cartridge.class); 
+
     private byte[] romData; // from 0x0000 to 0x7FFF
 
     public Cartridge(String romPath) {
         this.romData = loadFile(romPath);
+
+        LOGGER.debug("ROM size: " + romData.length);
+        LOGGER.debug("ROM @ 0x100: 0x%02X\n", Byte.toUnsignedInt(romData[0x100]));
     }
 
     /**
