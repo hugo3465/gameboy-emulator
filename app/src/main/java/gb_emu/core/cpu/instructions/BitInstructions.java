@@ -5,14 +5,13 @@ import java.util.HashMap;
 import gb_emu.core.cpu.Registers;
 import gb_emu.core.mem.MMU;
 
-public class ArithmeticInstructionsMap extends AbstractInstruction implements InstructionSet {
+public class BitInstructions extends AbstractInstruction implements InstructionSet {
 
-    public ArithmeticInstructionsMap(Registers registers, MMU mmu) {
+    public BitInstructions(Registers registers, MMU mmu) {
         super(registers, mmu);
     }
 
     @Override
     public void registerAll(HashMap<Integer, Runnable> functions) {
-        // TODO to be implemented
     }
 }

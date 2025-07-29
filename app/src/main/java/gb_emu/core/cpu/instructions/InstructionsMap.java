@@ -11,9 +11,11 @@ public class InstructionsMap {
     public InstructionsMap(MMU mmu, Registers registers) {
         // register all functions
         new LoadInstructionsMap(registers, mmu).registerAll(functions);
-        new ArithmeticInstructionsMap(registers, ram, mmu).registerAll(functions);
+        new ArithmeticInstructionsMap(registers, mmu).registerAll(functions);
         new IncDecInstructions(registers);
         new JumpInstructions(registers, mmu);
+        new MiscInstructions(registers, mmu);
+        new BitInstructions(registers, mmu);
     }
 
     public void execute(Integer id) {
