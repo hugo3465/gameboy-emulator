@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import gb_emu.core.cpu.Registers;
 import gb_emu.core.mem.MMU;
-import gb_emu.core.mem.RAM;
 
 public class LoadInstructionsMap implements InstructionSet {
     private Registers registers;
@@ -185,6 +184,52 @@ public class LoadInstructionsMap implements InstructionSet {
             int address = readImmediate16();
             int value = mmu.read(address);
             registers.setA(value);
+        });
+
+        functions.put(0x01, () -> { // LD BC, d16
+            int value = readImmediate16();
+            registers.setBC(value);
+        });
+        
+        functions.put(0x08, () -> { // LD (a16), SP
+            int address = readImmediate16();
+            int sp = registers.getSP();
+            mmu.write(address, sp & 0xFF);           // low byte
+            mmu.write((address + 1) & 0xFFFF, sp >> 8); // high byte
+        });
+
+        functions.put(0x11, () -> { // LD DE, d16
+            int value = readImmediate16();
+            registers.setDE(value);
+        });
+        
+        functions.put(0x21, () -> { // LD HL, d16
+            int value = readImmediate16();
+            registers.setHL(value);
+        });
+
+        functions.put(0x31, () -> { // LD SP, d16
+            int value = readImmediate16();
+            registers.setSP(value);
+        });
+
+        
+
+        functions.put(0xF8, () -> { // LD HL, SP+r8 (signed offset)
+            int offset = (byte) readImmediate8(); // signed 8-bit
+            int sp = registers.getSP();
+            int result = (sp + offset) & 0xFFFF;
+
+            registers.setHL(result);
+
+            registers.setFlagZ(false);
+            registers.setFlagN(false);
+            registers.setFlagH(((sp ^ offset ^ (result & 0xFFFF)) & 0x10) != 0);
+            registers.setFlagC(((sp ^ offset ^ (result & 0xFFFF)) & 0x100) != 0);
+        });
+        
+        functions.put(0xF9, () -> { // LD SP, HL
+            registers.setSP(registers.getHL());
         });
     }
 }
