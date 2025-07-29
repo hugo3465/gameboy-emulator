@@ -13,6 +13,14 @@ public class Registers {
     private int sp; // stack pointer
     private int pc; // program counter
 
+    /**
+     * flags
+     */
+    private boolean zf; // zero flag
+    private boolean nf; // subtraction flag
+    private boolean cf; // carry flag
+    private boolean hf; // half carry flag
+
     public int getA() {
         return a;
     }
@@ -192,5 +200,37 @@ public class Registers {
             default:
                 throw new IllegalArgumentException("Unknown register: " + name);
         }
+    }
+
+    public boolean getFlagZ() {
+        return zf;
+    }
+
+    public void setFlagZ(boolean value) {
+        zf = value;
+    }
+
+    public boolean getFlagN() {
+        return nf;
+    }
+
+    public void setFlagN(boolean value) {
+        nf = value;
+    }
+
+    public boolean getFlagC() {
+        return cf;
+    }
+
+    public void setFlagC(boolean value) {
+        cf = value;
+    }
+
+    public boolean getFlagH() {
+        return hf;
+    }
+
+    public void setFlagH(boolean value) {
+        hf = value;
     }
 }
