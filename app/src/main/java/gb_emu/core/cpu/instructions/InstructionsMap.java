@@ -12,6 +12,7 @@ public class InstructionsMap {
         // register all functions
         new LoadInstructionsMap(registers, mmu).registerAll(functions);
         new ArithmeticInstructionsMap(registers, ram, mmu).registerAll(functions);
+        new IncDecInstructions(registers);
         new JumpInstructions(registers, mmu);
     }
 
