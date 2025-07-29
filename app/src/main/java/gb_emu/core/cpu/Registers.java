@@ -128,6 +128,29 @@ public class Registers {
         l = value & 0xFF;
     }
 
+    public int getAF() {
+        int f = 0;
+        if (zf)
+            f |= 0x80;
+        if (nf)
+            f |= 0x40;
+        if (hf)
+            f |= 0x20;
+        if (cf)
+            f |= 0x10;
+        return (a << 8) | f;
+    }
+
+    public void setAF(int value) {
+        a = (value >> 8) & 0xFF;
+        int f = value & 0xF0; // Only upper 4 bits are used
+
+        zf = (f & 0x80) != 0;
+        nf = (f & 0x40) != 0;
+        hf = (f & 0x20) != 0;
+        cf = (f & 0x10) != 0;
+    }
+
     public void incrementPC() {
         this.pc = (pc + 1) & 0xffff; // ensure 16 bit
     }
@@ -168,6 +191,8 @@ public class Registers {
                 setDE(value);
             case "HL":
                 setHL(value);
+            case "AF":
+                setAF(value);
             default:
                 throw new IllegalArgumentException("Unknown register: " + name);
         }
@@ -197,6 +222,8 @@ public class Registers {
                 return getDE();
             case "HL":
                 return getHL();
+            case "AF":
+                return getAF();
             default:
                 throw new IllegalArgumentException("Unknown register: " + name);
         }
