@@ -8,8 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import gb_emu.core.cpu.InstructionsMap;
 import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.instructions.InstructionsMap;
 import gb_emu.core.mem.RAM;
 
 class InstructionsMapTest {

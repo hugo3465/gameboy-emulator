@@ -1,6 +1,13 @@
 package gb_emu.core.cpu;
 
 public class Registers {
+    private static final int STACK_POINTER_INITIAL_ADDRESS = 0xfffe;
+    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0100;
+    private static final int AF_INITIAL_ADDRESS = 0x01b0;
+    private static final int BC_INITIAL_ADDRESS = 0x0013;
+    private static final int DE_INITIAL_ADDRESS = 0x00d8;
+    private static final int HL_INITIAL_ADDRESS = 0x014d;
+    private static final int A_INITIAL_ADDRESS_FOR_GBC = 0x11;
 
     /**
      * 8 Bit Registers
@@ -20,6 +27,32 @@ public class Registers {
     private boolean nf; // subtraction flag
     private boolean cf; // carry flag
     private boolean hf; // half carry flag
+
+        public Registers() {
+        this.sp = STACK_POINTER_INITIAL_ADDRESS;
+        this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
+
+        setAF(AF_INITIAL_ADDRESS);
+        setBC(BC_INITIAL_ADDRESS);
+        setDE(DE_INITIAL_ADDRESS);
+        setHL(HL_INITIAL_ADDRESS);
+
+    }
+
+    public Registers(boolean isGbc) {
+        this.sp = STACK_POINTER_INITIAL_ADDRESS;
+        this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
+
+        if (isGbc) {
+            setA(A_INITIAL_ADDRESS_FOR_GBC);
+        }
+
+        setAF(AF_INITIAL_ADDRESS);
+        setBC(BC_INITIAL_ADDRESS);
+        setDE(DE_INITIAL_ADDRESS);
+        setHL(HL_INITIAL_ADDRESS);
+
+    }
 
     public int getA() {
         return a;
