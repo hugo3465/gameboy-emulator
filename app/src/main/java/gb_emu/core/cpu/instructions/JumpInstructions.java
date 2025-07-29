@@ -24,6 +24,23 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         registers.setPC(address);
     }
 
+    /**
+     * Helper method to perform the call operation (push return address and jump)
+     * @param address
+     */
+    private void call(int address) {
+        int pc = registers.getPC();
+        int returnAddress = (pc + 3) & 0xFFFF; // address after the CALL instruction (3 bytes)
+        int sp = (registers.getSP() - 2) & 0xFFFF;
+
+        // Push return address on stack (little endian)
+        mmu.write(sp, returnAddress & 0xFF);
+        mmu.write((sp + 1) & 0xFFFF, (returnAddress >> 8) & 0xFF);
+
+        registers.setSP(sp);
+        registers.setPC(address);
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Runnable> functions) {
         /**
@@ -101,6 +118,42 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             registers.setFlagH(true);
 
             registers.incrementPC();
+        });
+
+        /**
+         * CALL
+         */
+        functions.put(0xC4, () -> { // CALL NZ, a16 (opcode 0xC4)
+            int address = readImmediate16();
+            if (!registers.getFlagZ()) { // if Z flag is reset (NZ)
+                call(address);
+            }
+        });
+
+        functions.put(0xD4, () -> { // CALL NC, a16 (opcode 0xD4)
+            int address = readImmediate16();
+            if (!registers.getFlagC()) { // if C flag is reset (NC)
+                call(address);
+            }
+        });
+
+        functions.put(0xCC, () -> { // CALL Z, a16 (opcode 0xCC)
+            int address = readImmediate16();
+            if (registers.getFlagZ()) { // if Z flag is set (Z)
+                call(address);
+            }
+        });
+        
+        functions.put(0xCD, () -> { // CALL a16 (unconditional) (opcode 0xCD)
+            int address = readImmediate16();
+            call(address);
+        });
+
+        functions.put(0xDC, () -> { // CALL C, a16 (opcode 0xDC)
+            int address = readImmediate16();
+            if (registers.getFlagC()) { // if C flag is set (C)
+                call(address);
+            }
         });
     }
 }

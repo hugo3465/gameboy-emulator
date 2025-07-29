@@ -29,12 +29,12 @@ public class CPU implements Serializable {
         int pcBefore = registers.getPC();
         int opcode = mmu.read(pcBefore);
 
-        LOGGER.debug("Opcode: " + opcode);
+        LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         LOGGER.debug("PC: " + pcBefore);
 
         instructionsMap.execute(opcode);
 
-        // If PC hans't change, increment it to avoid crashing
+        // If PC hans't change, increment it to avoid crashes
         int pcAfter = registers.getPC();
         if (pcBefore == pcAfter) {
             registers.incrementPC();
