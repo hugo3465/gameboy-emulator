@@ -45,8 +45,7 @@ public class MMU {
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             return wram.read(address - ECHO_RAM_TO_WRAM_SHIFT); // Echo RAM
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            // not implemented
-            // return gpu.readOAM(address - 0xFE00);
+            return gpu.readOAM(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // return registers.read(address);
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
@@ -72,7 +71,7 @@ public class MMU {
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             wram.write((address - ECHO_RAM_TO_WRAM_SHIFT), value);
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            // gpu.writeOAM(address - 0xFE00, value);
+            gpu.writeOAM(address, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // registers.write(address, value);
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
