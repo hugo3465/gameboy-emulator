@@ -36,7 +36,7 @@ public class GameBoy {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            // future: gpu.step(), timers.step(), input.step()
+            // future: timers.step(), input.step()
         }
     }
 

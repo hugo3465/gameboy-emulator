@@ -87,7 +87,7 @@ public class GPU {
         final int SCY = registers.getSCY();
 
         if ((LCDC & 0x01) == 0)
-            return; // BG Display bit
+            return; // Background display is disabled
 
         int tileMapBase = ((LCDC & 0x08) != 0) ? 0x9C00 : 0x9800;
         int tileDataBase = ((LCDC & 0x10) != 0) ? 0x8000 : 0x8800;
@@ -100,14 +100,24 @@ public class GPU {
             int tileY = scrolledY / 8;
 
             int tileIndexAddr = tileMapBase + tileY * 32 + tileX;
-            int tileIndex = vRam.read(tileIndexAddr - VRAM_OFFSET);
-            
-            // Fetch tile pixel line
+            int tileIndex = vRam.read(tileIndexAddr);
+
+            if ((LCDC & 0x10) == 0) {
+                tileIndex = (byte) tileIndex; // Interpret tile index as signed (range -128 to 127)
+            }
+
+            // Fetch tile pixel row
             int tileLine = scrolledY % 8;
             int tileAddr = tileDataBase + tileIndex * 16 + tileLine * 2;
-            
-            int low = vRam.read(tileAddr - VRAM_OFFSET);
-            int high = vRam.read(tileAddr + 1 - VRAM_OFFSET);
+            int indexLow = tileAddr;
+            int indexHigh = indexLow + 1;
+
+            if (indexLow < 0 || indexHigh >= VRAM_CAPACITY) {
+                continue; // Skip this pixel if the address is invalid
+            }
+
+            int low = vRam.read(tileAddr);
+            int high = vRam.read(tileAddr + 1);
 
             int bitIndex = 7 - (scrolledX % 8);
             int bit0 = (low >> bitIndex) & 1;
