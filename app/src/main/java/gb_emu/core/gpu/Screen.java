@@ -10,12 +10,13 @@ public class Screen {
     public Screen() {
     }
 
-    public int[] getScreen() {
+    public int[] getPixels() {
         return screen;
     }
 
-    public void writeOnScreen(int index, int value) {
-        screen[index] = value;
+    public void writeOnScreen(int index, int color) {
+        if (index >= 0 && index < screen.length) {
+            screen[index] = color;
+        }
     }
-
 }

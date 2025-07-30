@@ -23,6 +23,7 @@ public class GameBoy {
     public void start() {
         while (true) {
             cpu.step();
+            gpu.step(0);
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
