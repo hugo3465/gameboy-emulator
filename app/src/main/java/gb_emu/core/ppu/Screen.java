@@ -1,4 +1,4 @@
-package gb_emu.core.gpu;
+package gb_emu.core.ppu;
 
 public class Screen {
     public static int SCREEN_WIDTH = 160;

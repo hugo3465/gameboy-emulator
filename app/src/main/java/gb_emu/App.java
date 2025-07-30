@@ -2,6 +2,7 @@ package gb_emu;
 
 import gb_emu.core.GameBoy;
 import gb_emu.core.mem.cartridge.Cartridge;
+import gb_emu.ui.Screen;
 
 public class App {
     public static void main(String[] args) {
@@ -10,6 +11,14 @@ public class App {
         System.out.println(cartridge.getCartridgeType());
 
         GameBoy gameBoy = new GameBoy(cartridge);
-        gameBoy.start();
+        
+        new Thread(() -> {
+            gameBoy.start();
+        }).start();
+        
+        new Thread(() -> {
+            Screen screen = new Screen(160, 144, gameBoy);
+            screen.start();
+        }).start();
     }
 }

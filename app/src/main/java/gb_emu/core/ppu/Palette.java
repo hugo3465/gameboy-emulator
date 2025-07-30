@@ -1,4 +1,4 @@
-package gb_emu.core.gpu;
+package gb_emu.core.ppu;
 
 public class Palette {
     private static int PALETTE_SIZE = 4;

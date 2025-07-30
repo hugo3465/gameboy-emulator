@@ -1,8 +1,8 @@
-package gb_emu.core.gpu;
+package gb_emu.core.ppu;
 
 import gb_emu.core.mem.RAM;
 
-public class GPU {
+public class PPU {
     private static final int VRAM_CAPACITY = 0x2000; // 8KB
     private static final int VRAM_OFFSET = 0x8000;
     private static final int OAM_CAPACITY = 0xA0; // 160 bytes
@@ -18,18 +18,18 @@ public class GPU {
     private RAM vRam;
     private RAM oam;
     private Screen screen;
-    private GPURegisters registers;
+    private PPURegisters registers;
     private Palette bgPalette;
 
     private Mode mode = Mode.OAM_SEARCH;
     private int modeClock = 0;
     private int line = 0;
 
-    public GPU() {
+    public PPU() {
         this.vRam = new RAM(VRAM_CAPACITY, VRAM_OFFSET);
         this.oam = new RAM(OAM_CAPACITY, OAM_OFFSET);
         this.screen = new Screen();
-        this.registers = new GPURegisters();
+        this.registers = new PPURegisters();
         this.bgPalette = new Palette();
     }
 
@@ -78,6 +78,12 @@ public class GPU {
                 }
                 break;
         }
+
+        // TODO TEMPORÁRIO: simula renderização de todas as linhas (ignora timing real)
+        for (int i = 0; i < 144; i++) {
+            registers.setLY(i);
+            renderScanline();
+        }
     }
 
     private void renderScanline() {
@@ -109,12 +115,8 @@ public class GPU {
             // Fetch tile pixel row
             int tileLine = scrolledY % 8;
             int tileAddr = tileDataBase + tileIndex * 16 + tileLine * 2;
-            int indexLow = tileAddr;
-            int indexHigh = indexLow + 1;
-
-            if (indexLow < 0 || indexHigh >= VRAM_CAPACITY) {
-                continue; // Skip this pixel if the address is invalid
-            }
+            // int indexLow = tileAddr;
+            // int indexHigh = indexLow + 1;
 
             int low = vRam.read(tileAddr);
             int high = vRam.read(tileAddr + 1);

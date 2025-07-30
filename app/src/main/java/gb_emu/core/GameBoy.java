@@ -4,10 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gb_emu.core.cpu.CPU;
-import gb_emu.core.gpu.GPU;
 import gb_emu.core.mem.MMU;
 import gb_emu.core.mem.RAM;
 import gb_emu.core.mem.cartridge.Cartridge;
+import gb_emu.core.ppu.PPU;
 
 public class GameBoy {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameBoy.class);
@@ -16,19 +16,19 @@ public class GameBoy {
     private Cartridge cartridge;
     private RAM ram;
     private MMU mmu;
-    private GPU gpu;
+    private PPU ppu;
 
     public GameBoy(Cartridge cartridge) {
         this.cartridge = cartridge;
-        this.gpu = new GPU();
-        this.mmu = new MMU(cartridge, gpu);
+        this.ppu = new PPU();
+        this.mmu = new MMU(cartridge, ppu);
         this.cpu = new CPU(this, mmu);
     }
 
     public void start() {
         while (true) {
             int cycles = cpu.step();
-            gpu.step(cycles);
+            ppu.step(cycles);
 
             try {
                 Thread.sleep(100);
@@ -50,5 +50,9 @@ public class GameBoy {
 
     public RAM getRam() {
         return ram;
+    }
+
+    public int[] getScreen() {
+        return ppu.getFrame();
     }
 }
