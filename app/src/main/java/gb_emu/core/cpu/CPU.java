@@ -13,7 +13,7 @@ public class CPU implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CPU.class);
 
     private GameBoy gb;
-    private Registers registers;
+    private CPURegisters registers;
     private MMU mmu;
     private InstructionsMap instructionsMap;
 
@@ -21,7 +21,7 @@ public class CPU implements Serializable {
         this.gb = gb;
         this.mmu = mmu;
 
-        this.registers = new Registers();
+        this.registers = new CPURegisters();
         this.instructionsMap = new InstructionsMap(mmu, registers);
     }
 
