@@ -1,6 +1,6 @@
 package gb_emu.core.cpu;
 
-public class Registers {
+public class CPURegisters {
     private static final int STACK_POINTER_INITIAL_ADDRESS = 0xfffe;
     private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0100;
     private static final int AF_INITIAL_ADDRESS = 0x01b0;
@@ -28,7 +28,7 @@ public class Registers {
     private boolean cf; // carry flag
     private boolean hf; // half carry flag
 
-        public Registers() {
+        public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
         this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
 
@@ -39,7 +39,7 @@ public class Registers {
 
     }
 
-    public Registers(boolean isGbc) {
+    public CPURegisters(boolean isGbc) {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
         this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
 

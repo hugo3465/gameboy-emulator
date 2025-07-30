@@ -2,13 +2,13 @@ package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
-import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
 public class InstructionsMap {
     private HashMap<Integer, Runnable> functions = new HashMap<>();
 
-    public InstructionsMap(MMU mmu, Registers registers) {
+    public InstructionsMap(MMU mmu, CPURegisters registers) {
         // register all functions
         new LoadInstructionsMap(registers, mmu).registerAll(functions);
         new ArithmeticInstructionsMap(registers, mmu).registerAll(functions);

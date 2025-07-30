@@ -2,12 +2,12 @@ package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
-import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
 public class JumpInstructions extends AbstractInstruction implements InstructionSet {
 
-    public JumpInstructions(Registers registers, MMU mmu) {
+    public JumpInstructions(CPURegisters registers, MMU mmu) {
         super(registers, mmu);
     }
 
