@@ -1,5 +1,6 @@
 package gb_emu.core.cpu.instructions;
 
+import gb_emu.core.Instruction;
 import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
@@ -10,6 +11,13 @@ public abstract class AbstractInstruction {
     public AbstractInstruction(CPURegisters registers, MMU mmu) {
         this.registers = registers;
         this.mmu = mmu;
+    }
+
+    protected Instruction wrap(Runnable r, int cycles) {
+        return () -> {
+            r.run();
+            return cycles;
+        };
     }
 
     protected int readImmediate8() {

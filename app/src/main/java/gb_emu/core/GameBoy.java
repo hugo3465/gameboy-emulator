@@ -1,5 +1,8 @@
 package gb_emu.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gb_emu.core.cpu.CPU;
 import gb_emu.core.gpu.GPU;
 import gb_emu.core.mem.MMU;
@@ -7,6 +10,8 @@ import gb_emu.core.mem.RAM;
 import gb_emu.core.mem.cartridge.Cartridge;
 
 public class GameBoy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GameBoy.class);
+
     private CPU cpu;
     private Cartridge cartridge;
     private RAM ram;
@@ -22,8 +27,9 @@ public class GameBoy {
 
     public void start() {
         while (true) {
-            cpu.step();
-            gpu.step(0);
+            int cycles = cpu.step();
+            gpu.step(cycles);
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

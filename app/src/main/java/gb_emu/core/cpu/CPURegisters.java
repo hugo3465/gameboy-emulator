@@ -188,6 +188,10 @@ public class CPURegisters {
         this.pc = (pc + 1) & 0xffff; // ensure 16 bit
     }
 
+    public void incrementPC(int value) {
+        this.pc = (pc + value) & 0xffff; // ensure 16 bit
+    }
+
     public void decrementPC() {
         this.pc = (pc - 1) & 0xffff;
     }

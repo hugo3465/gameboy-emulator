@@ -2,13 +2,13 @@ package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
+import gb_emu.core.Instruction;
 import gb_emu.core.cpu.CPURegisters;
+import gb_emu.core.mem.MMU;
 
-public class IncDecInstructions implements InstructionSet {
-    private CPURegisters registers;
-
-    public IncDecInstructions(CPURegisters registers) {
-        this.registers = registers;
+public class IncDecInstructions extends AbstractInstruction implements InstructionSet {
+    public IncDecInstructions(CPURegisters registers, MMU mmu) {
+        super(registers, mmu);
     }
 
     private void inc8Bit(java.util.function.IntSupplier getter, java.util.function.IntConsumer setter) {
@@ -57,37 +57,37 @@ public class IncDecInstructions implements InstructionSet {
     }
 
     @Override
-    public void registerAll(HashMap<Integer, Runnable> functions) {
+    public void registerAll(HashMap<Integer, Instruction> functions) {
         /**
          * INC
          */
-        functions.put(0x03, () -> inc16Bit(registers::getBC, registers::setBC)); // INC BC
-        functions.put(0x04, () -> inc8Bit(registers::getB, registers::setB)); // INC B
-        functions.put(0x0C, () -> inc8Bit(registers::getC, registers::setC)); // INC C
-        functions.put(0x13, () -> inc16Bit(registers::getDE, registers::setDE)); // INC DE
-        functions.put(0x14, () -> inc8Bit(registers::getD, registers::setD)); // INC D
-        functions.put(0x1C, () -> inc8Bit(registers::getE, registers::setE)); // INC E
-        functions.put(0x23, () -> inc16Bit(registers::getHL, registers::setHL)); // INC HL
-        functions.put(0x24, () -> inc8Bit(registers::getH, registers::setH)); // INC H
-        functions.put(0x2C, () -> inc8Bit(registers::getL, registers::setL)); // INC L
-        functions.put(0x3C, () -> inc8Bit(registers::getA, registers::setA)); // INC A
-        functions.put(0x33, () -> inc16Bit(registers::getSP, registers::setSP)); // INC SP
-        functions.put(0x34, () -> inc16Bit(registers::getHL, registers::setHL)); // // INC (HL)
+        functions.put(0x03, wrap(() -> inc16Bit(registers::getBC, registers::setBC), 8)); // INC BC
+        functions.put(0x04, wrap(() -> inc8Bit(registers::getB, registers::setB), 4)); // INC B
+        functions.put(0x0C, wrap(() -> inc8Bit(registers::getC, registers::setC), 4)); // INC C
+        functions.put(0x13, wrap(() -> inc16Bit(registers::getDE, registers::setDE), 8)); // INC DE
+        functions.put(0x14, wrap(() -> inc8Bit(registers::getD, registers::setD), 4)); // INC D
+        functions.put(0x1C, wrap(() -> inc8Bit(registers::getE, registers::setE), 4)); // INC E
+        functions.put(0x23, wrap(() -> inc16Bit(registers::getHL, registers::setHL), 8)); // INC HL
+        functions.put(0x24, wrap(() -> inc8Bit(registers::getH, registers::setH), 4)); // INC H
+        functions.put(0x2C, wrap(() -> inc8Bit(registers::getL, registers::setL), 4)); // INC L
+        functions.put(0x3C, wrap(() -> inc8Bit(registers::getA, registers::setA), 4)); // INC A
+        functions.put(0x33, wrap(() -> inc16Bit(registers::getSP, registers::setSP), 8)); // INC SP
+        functions.put(0x34, wrap(() -> inc16Bit(registers::getHL, registers::setHL), 12)); // // INC (HL)
 
         /**
          * DEC
          */
-        functions.put(0x05, () -> dec8Bit(registers::getB, registers::setB)); // DEC B
-        functions.put(0x0D, () -> dec8Bit(registers::getC, registers::setC)); // DEC C
-        functions.put(0x15, () -> dec8Bit(registers::getD, registers::setD)); // DEC D
-        functions.put(0x1D, () -> dec8Bit(registers::getE, registers::setE)); // DEC E
-        functions.put(0x25, () -> dec8Bit(registers::getH, registers::setH)); // DEC H
-        functions.put(0x2D, () -> dec8Bit(registers::getL, registers::setL)); // DEC L
-        functions.put(0x3D, () -> dec8Bit(registers::getA, registers::setA)); // DEC A
-        functions.put(0x0B, () -> dec16Bit(registers::getBC, registers::setBC)); // DEC BC
-        functions.put(0x1B, () -> dec16Bit(registers::getDE, registers::setDE)); // DEC DE
-        functions.put(0x2B, () -> dec16Bit(registers::getHL, registers::setHL)); // DEC HL
-        functions.put(0x3B, () -> dec16Bit(registers::getSP, registers::setSP)); // DEC SP
-        functions.put(0x35, () -> dec16Bit(registers::getHL, registers::setHL)); // DEC HL
+        functions.put(0x05, wrap(() -> dec8Bit(registers::getB, registers::setB), 4)); // DEC B
+        functions.put(0x0D, wrap(() -> dec8Bit(registers::getC, registers::setC), 4)); // DEC C
+        functions.put(0x15, wrap(() -> dec8Bit(registers::getD, registers::setD), 4)); // DEC D
+        functions.put(0x1D, wrap(() -> dec8Bit(registers::getE, registers::setE), 4)); // DEC E
+        functions.put(0x25, wrap(() -> dec8Bit(registers::getH, registers::setH), 4)); // DEC H
+        functions.put(0x2D, wrap(() -> dec8Bit(registers::getL, registers::setL), 4)); // DEC L
+        functions.put(0x3D, wrap(() -> dec8Bit(registers::getA, registers::setA), 4)); // DEC A
+        functions.put(0x0B, wrap(() -> dec16Bit(registers::getBC, registers::setBC), 8)); // DEC BC
+        functions.put(0x1B, wrap(() -> dec16Bit(registers::getDE, registers::setDE), 8)); // DEC DE
+        functions.put(0x2B, wrap(() -> dec16Bit(registers::getHL, registers::setHL), 8)); // DEC HL
+        functions.put(0x3B, wrap(() -> dec16Bit(registers::getSP, registers::setSP), 8)); // DEC SP
+        functions.put(0x35, wrap(() -> dec16Bit(registers::getHL, registers::setHL), 12)); // DEC HL
     }
 }
