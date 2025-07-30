@@ -2,11 +2,11 @@ package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
-import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
 public class LoadInstructionsMap extends AbstractInstruction implements InstructionSet {
-    public LoadInstructionsMap(Registers registers, MMU mmu) {
+    public LoadInstructionsMap(CPURegisters registers, MMU mmu) {
         super(registers, mmu);
     }
 

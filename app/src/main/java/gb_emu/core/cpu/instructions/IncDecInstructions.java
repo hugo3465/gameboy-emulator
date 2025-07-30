@@ -2,12 +2,12 @@ package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
 
-import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.CPURegisters;
 
 public class IncDecInstructions implements InstructionSet {
-    private Registers registers;
+    private CPURegisters registers;
 
-    public IncDecInstructions(Registers registers) {
+    public IncDecInstructions(CPURegisters registers) {
         this.registers = registers;
     }
 

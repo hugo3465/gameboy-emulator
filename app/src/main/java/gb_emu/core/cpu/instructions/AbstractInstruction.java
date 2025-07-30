@@ -1,13 +1,13 @@
 package gb_emu.core.cpu.instructions;
 
-import gb_emu.core.cpu.Registers;
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
 public abstract class AbstractInstruction {
-    protected Registers registers;
+    protected CPURegisters registers;
     protected MMU mmu;
 
-    public AbstractInstruction(Registers registers, MMU mmu) {
+    public AbstractInstruction(CPURegisters registers, MMU mmu) {
         this.registers = registers;
         this.mmu = mmu;
     }
