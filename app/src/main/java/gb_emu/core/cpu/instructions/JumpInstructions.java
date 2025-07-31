@@ -65,14 +65,12 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
          * JR
          */
         functions.put(0x18, wrap(() -> { // JR r8 (unconditional jump)
-            registers.incrementPC(); // skip opcode
             byte offset = (byte) readImmediate8(); // signed 8-bit offset
             int pc = registers.getPC();
             registers.setPC((pc + offset) & 0xFFFF);
         }, 12));
 
         functions.put(0x20, wrap(() -> { // JR NZ, r8
-            registers.incrementPC();
             byte offset = (byte) readImmediate8();
             if (!registers.getFlagZ()) {
                 int pc = registers.getPC();
@@ -81,7 +79,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         }, 12));
 
         functions.put(0x28, wrap(() -> { // JR Z, r8
-            registers.incrementPC();
             byte offset = (byte) readImmediate8();
             if (registers.getFlagZ()) {
                 int pc = registers.getPC();
@@ -90,7 +87,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         }, 12));
 
         functions.put(0x30, wrap(() -> { // JR NC, r8
-            registers.incrementPC();
             byte offset = (byte) readImmediate8();
             if (!registers.getFlagC()) {
                 int pc = registers.getPC();
@@ -99,7 +95,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         }, 12));
 
         functions.put(0x38, wrap(() -> { // JR C, r8
-            registers.incrementPC();
             byte offset = (byte) readImmediate8();
             if (registers.getFlagC()) {
                 int pc = registers.getPC();
@@ -107,6 +102,9 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             }
         }, 12));
 
+        /**
+         * CPL
+         */
         functions.put(0x2F, wrap(() -> { // CPL
             int a = registers.getA();
             a = a ^ 0xFF;
