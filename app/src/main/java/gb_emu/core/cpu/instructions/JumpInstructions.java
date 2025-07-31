@@ -126,45 +126,49 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         /**
          * CALL
          */
-        functions.put(0xC4, wrap(() -> { // CALL NZ, a16
+        functions.put(0xC4, () -> { // CALL NZ, a16
             int address = readImmediate16();
             if (!registers.getFlagZ()) {
                 call(address);
+                return 24;
             } else {
-                registers.incrementPC(3); // skip instruction bytes if no call
+                return 12;
             }
-        }, 12));
+        });
 
-        functions.put(0xD4, wrap(() -> { // CALL NC, a16
-            int address = readImmediate16();
-            if (!registers.getFlagC()) {
-                call(address);
-            } else {
-                registers.incrementPC(3);
-            }
-        }, 12));
-
-        functions.put(0xCC, wrap(() -> { // CALL Z, a16
+        functions.put(0xCC, () -> { // CALL Z, a16
             int address = readImmediate16();
             if (registers.getFlagZ()) {
                 call(address);
+                return 24;
             } else {
-                registers.incrementPC(3);
+                return 12;
             }
-        }, 12));
+        });
+
+        functions.put(0xD4, () -> { // CALL NC, a16
+            int address = readImmediate16();
+            if (!registers.getFlagC()) {
+                call(address);
+                return 24;
+            } else {
+                return 12;
+            }
+        });
+
+        functions.put(0xDC, () -> { // CALL C, a16
+            int address = readImmediate16();
+            if (registers.getFlagC()) {
+                call(address);
+                return 24;
+            } else {
+                return 12;
+            }
+        });
 
         functions.put(0xCD, wrap(() -> { // CALL a16 (unconditional)
             int address = readImmediate16();
             call(address);
         }, 24));
-
-        functions.put(0xDC, wrap(() -> { // CALL C, a16
-            int address = readImmediate16();
-            if (registers.getFlagC()) {
-                call(address);
-            } else {
-                registers.incrementPC(3);
-            }
-        }, 12));
     }
 }

@@ -28,7 +28,7 @@ public class CPURegisters {
     private boolean cf; // carry flag
     private boolean hf; // half carry flag
 
-        public CPURegisters() {
+    public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
         this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
 
