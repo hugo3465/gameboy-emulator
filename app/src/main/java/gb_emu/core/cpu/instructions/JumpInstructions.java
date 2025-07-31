@@ -26,6 +26,13 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         registers.setPC(address);
     }
 
+    private void ret() {
+        int low = mmu.read(registers.getSP()) & 0xFF;
+        int high = mmu.read(registers.getSP() + 1) & 0xFF;
+        registers.setSP(registers.getSP() + 2);
+        registers.setPC((high << 8) | low);
+    }
+
     /**
      * Helper method to perform the call operation (push return address and jump)
      * 
@@ -53,18 +60,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             int address = readImmediate16();
             registers.setPC(address);
         }, 16));
-
-        /**
-         * RST
-         */
-        functions.put(0xC7, wrap(() -> rst(0x00), 16)); // RST 00H
-        functions.put(0xCF, wrap(() -> rst(0x08), 16)); // RST 08H
-        functions.put(0xD7, wrap(() -> rst(0x10), 16)); // RST 10H
-        functions.put(0xDF, wrap(() -> rst(0x18), 16)); // RST 18H
-        functions.put(0xE7, wrap(() -> rst(0x20), 16)); // RST 20H
-        functions.put(0xEF, wrap(() -> rst(0x28), 16)); // RST 28H
-        functions.put(0xF7, wrap(() -> rst(0x30), 16)); // RST 30H
-        functions.put(0xFF, wrap(() -> rst(0x38), 16)); // RST 38H
 
         /**
          * JR
@@ -184,5 +179,64 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
 
             cpu.setInterruptsEnabled(true);
         }, 16));
+
+        /**
+         * RET
+         */
+        functions.put(0xC9, wrap(() -> { // RET (Unconditional)
+            ret();
+        }, 16));
+
+        functions.put(0xC0, wrap(() -> { // RET NZ
+            if (!registers.getFlagZ()) {
+                ret();
+            } else {
+                registers.incrementPC();
+            }
+        }, 8)); // 20 cycles if taken, 8 if not. Handled dynamically if needed
+
+        functions.put(0xC8, wrap(() -> { // RET Z
+            if (registers.getFlagZ()) {
+                ret();
+            } else {
+                registers.incrementPC();
+            }
+        }, 8));
+
+        functions.put(0xD0, wrap(() -> { // RET NC
+            if (!registers.getFlagC()) {
+                ret();
+            } else {
+                registers.incrementPC();
+            }
+        }, 8));
+
+        functions.put(0xD8, wrap(() -> { // RET C
+            if (registers.getFlagC()) {
+                ret();
+            } else {
+                registers.incrementPC();
+            }
+        }, 8));
+
+        /**
+         * RETI
+         */
+        functions.put(0xD9, wrap(() -> { // RETI
+            ret();
+            cpu.setInterruptsEnabled(true);
+        }, 16));
+
+        /**
+         * RST
+         */
+        functions.put(0xC7, wrap(() -> rst(0x00), 16)); // RST 00H
+        functions.put(0xCF, wrap(() -> rst(0x08), 16)); // RST 08H
+        functions.put(0xD7, wrap(() -> rst(0x10), 16)); // RST 10H
+        functions.put(0xDF, wrap(() -> rst(0x18), 16)); // RST 18H
+        functions.put(0xE7, wrap(() -> rst(0x20), 16)); // RST 20H
+        functions.put(0xEF, wrap(() -> rst(0x28), 16)); // RST 28H
+        functions.put(0xF7, wrap(() -> rst(0x30), 16)); // RST 30H
+        functions.put(0xFF, wrap(() -> rst(0x38), 16)); // RST 38H
     }
 }
