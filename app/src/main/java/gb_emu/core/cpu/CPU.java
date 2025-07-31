@@ -45,10 +45,17 @@ public class CPU implements Serializable {
         int opcode = mmu.read(pc);
         registers.incrementPC();
 
+        if (opcode == 0xCB) { // PREFIX
+            int cbOpcode = mmu.read(registers.getPC());
+            registers.incrementPC();
+            LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
+            return instructionsMap.execute(cbOpcode, true); // novo método!
+        }
+
         LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         LOGGER.debug("PC: " + String.format("0x%04X", pc));
 
-        int cycles = instructionsMap.execute(opcode);
+        int cycles = instructionsMap.execute(opcode, false);
 
         // Handle interrupts if enabled
         if (interruptsEnabled) {
@@ -60,23 +67,24 @@ public class CPU implements Serializable {
 
     /**
      * Check if CPU should wake up from STOP/HALT mode
+     * 
      * @return true if should wake up
      */
     private boolean shouldWakeUp() {
         // Check for pending interrupts
         int interruptEnable = mmu.read(0xFFFF) & 0xFF; // IE register
-        int interruptFlags = mmu.read(0xFF0F) & 0xFF;  // IF register
-        
+        int interruptFlags = mmu.read(0xFF0F) & 0xFF; // IF register
+
         // If any enabled interrupt is pending, wake up
         boolean hasInterrupt = (interruptEnable & interruptFlags) != 0;
-        
+
         // For STOP mode, also check for joypad input (button press)
         if (stopped) {
             // Joypad interrupt (bit 4) can wake from STOP
             boolean joypadInterrupt = (interruptEnable & interruptFlags & 0x10) != 0;
             return joypadInterrupt;
         }
-        
+
         // For HALT mode, any interrupt can wake up
         return hasInterrupt;
     }
@@ -86,35 +94,45 @@ public class CPU implements Serializable {
      */
     private void handleInterrupts() {
         int interruptEnable = mmu.read(0xFFFF) & 0xFF; // IE register
-        int interruptFlags = mmu.read(0xFF0F) & 0xFF;  // IF register
-        
+        int interruptFlags = mmu.read(0xFF0F) & 0xFF; // IF register
+
         int pendingInterrupts = interruptEnable & interruptFlags;
-        
+
         if (pendingInterrupts != 0) {
             // Find highest priority interrupt (lowest bit number)
             for (int i = 0; i < 5; i++) {
                 if ((pendingInterrupts & (1 << i)) != 0) {
                     // Clear the interrupt flag
                     mmu.write(0xFF0F, interruptFlags & ~(1 << i));
-                    
+
                     // Disable interrupts
                     interruptsEnabled = false;
-                    
+
                     // Push PC onto stack
                     registers.decrementSP();
                     mmu.write(registers.getSP(), (registers.getPC() >> 8) & 0xFF);
                     registers.decrementSP();
                     mmu.write(registers.getSP(), registers.getPC() & 0xFF);
-                    
+
                     // Jump to interrupt vector
                     switch (i) {
-                        case 0: registers.setPC(0x40); break; // V-Blank
-                        case 1: registers.setPC(0x48); break; // LCD STAT
-                        case 2: registers.setPC(0x50); break; // Timer
-                        case 3: registers.setPC(0x58); break; // Serial
-                        case 4: registers.setPC(0x60); break; // Joypad
+                        case 0:
+                            registers.setPC(0x40);
+                            break; // V-Blank
+                        case 1:
+                            registers.setPC(0x48);
+                            break; // LCD STAT
+                        case 2:
+                            registers.setPC(0x50);
+                            break; // Timer
+                        case 3:
+                            registers.setPC(0x58);
+                            break; // Serial
+                        case 4:
+                            registers.setPC(0x60);
+                            break; // Joypad
                     }
-                    
+
                     LOGGER.debug("Interrupt {} triggered, jumping to 0x{:02X}", i, registers.getPC());
                     break;
                 }
