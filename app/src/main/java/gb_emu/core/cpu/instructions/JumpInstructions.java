@@ -3,13 +3,14 @@ package gb_emu.core.cpu.instructions;
 import java.util.HashMap;
 
 import gb_emu.core.Instruction;
+import gb_emu.core.cpu.CPU;
 import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 
 public class JumpInstructions extends AbstractInstruction implements InstructionSet {
 
-    public JumpInstructions(CPURegisters registers, MMU mmu) {
-        super(registers, mmu);
+    public JumpInstructions(CPU cpu, CPURegisters registers, MMU mmu) {
+        super(cpu, registers, mmu);
     }
 
     private void rst(int address) {
