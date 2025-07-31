@@ -170,5 +170,19 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             int address = readImmediate16();
             call(address);
         }, 24));
+
+        functions.put(0xD9, wrap(() -> { // RETI
+            // Pop low and high bytes from the stack
+            int low = mmu.read(registers.getSP()) & 0xFF;
+            registers.incrementSP();
+            int high = mmu.read(registers.getSP()) & 0xFF;
+            registers.incrementSP();
+
+            // fuse 2 bytes on a 16 bits address
+            int address = (high << 8) | low;
+            registers.setPC(address);
+
+            cpu.setInterruptsEnabled(true);
+        }, 16));
     }
 }
