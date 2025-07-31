@@ -31,7 +31,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD B, r
         functions.put(0x06, wrap(() -> {
             registers.setB(readImmediate8());
-            registers.incrementPC(2); // opcode + 1 byte imediato
+            registers.incrementPC();
         }, 8)); // LD B, d8
 
         functions.put(0x40, wrap(() -> {
@@ -77,7 +77,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD C, r
         functions.put(0x0E, wrap(() -> {
             registers.setC(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD C, d8
 
         functions.put(0x48, wrap(() -> {
@@ -123,7 +123,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD D, r
         functions.put(0x16, wrap(() -> {
             registers.setD(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD D, d8
 
         functions.put(0x50, wrap(() -> {
@@ -169,7 +169,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD E, r
         functions.put(0x1E, wrap(() -> {
             registers.setE(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD E, d8
 
         functions.put(0x58, wrap(() -> {
@@ -215,7 +215,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD H, r
         functions.put(0x26, wrap(() -> {
             registers.setH(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD H, d8
 
         functions.put(0x60, wrap(() -> {
@@ -261,7 +261,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD L, r
         functions.put(0x2E, wrap(() -> {
             registers.setL(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD L, d8
 
         functions.put(0x68, wrap(() -> {
@@ -307,7 +307,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD (HL), r
         functions.put(0x36, wrap(() -> {
             mmu.write(registers.getHL(), readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 12)); // LD (HL), d8
 
         functions.put(0x70, wrap(() -> {
@@ -353,7 +353,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
 
         functions.put(0x3E, wrap(() -> {
             registers.setA(readImmediate8());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 8)); // LD A, d8
 
         functions.put(0x78, wrap(() -> {
@@ -428,7 +428,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0xE0, wrap(() -> { // LDH (a8), A
             int address = 0xFF00 + readImmediate8();
             mmu.write(address, registers.getA());
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0xE2, wrap(() -> { // LD (C), A
@@ -447,7 +447,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int address = 0xFF00 + readImmediate8();
             int value = mmu.read(address);
             registers.setA(value);
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0xF2, wrap(() -> { // LD A, (C)
@@ -508,7 +508,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.setFlagH(((sp ^ offset ^ result) & 0x10) != 0);
             registers.setFlagC(((sp ^ offset ^ result) & 0x100) != 0);
 
-            registers.incrementPC(2);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0xF9, wrap(() -> { // LD SP, HL
