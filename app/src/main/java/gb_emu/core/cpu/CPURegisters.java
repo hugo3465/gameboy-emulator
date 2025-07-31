@@ -208,6 +208,10 @@ public class CPURegisters {
         this.sp = (sp - 1) & 0xffff;
     }
 
+    public void decrementSP(int value) {
+        this.sp = (sp - value) & 0xffff;
+    }
+
     public void setRegister(String name, int value) {
         switch (name.toUpperCase()) {
             case "A":

@@ -153,7 +153,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x68, wrap(() -> ld_r_r(registers::setL, registers::getB), 4)); // LD L, B
 
         functions.put(0x69, wrap(() -> ld_r_r(registers::setL, registers::getC), 4)); // LD L, C
-        
+
         functions.put(0x6A, wrap(() -> ld_r_r(registers::setL, registers::getD), 4)); // LD L, D
 
         functions.put(0x6B, wrap(() -> ld_r_r(registers::setL, registers::getE), 4)); // LD L, E
@@ -356,5 +356,32 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.setAF(value & 0xFFF0); // clear AF registers
         }, 12));
 
+        /**
+         * PUSH
+         */
+        functions.put(0xC5, wrap(() -> { // PUSH BC
+            int value = registers.getBC();
+            registers.decrementSP(2);
+            mmu.write(registers.getSP(), value);
+        }, 16));
+
+        functions.put(0xD5, wrap(() -> { // PUSH DE
+            int value = registers.getDE();
+            registers.decrementSP(2);
+            mmu.write(registers.getSP(), value);
+        }, 16));
+
+        functions.put(0xE5, wrap(() -> { // PUSH HL
+            int value = registers.getHL();
+            registers.decrementSP(2);
+            mmu.write(registers.getSP(), value);
+        }, 16));
+
+        functions.put(0xF5, wrap(() -> { // PUSH AF
+            // Rule: bits 0-3 of F must be 0
+            int af = (registers.getA() << 8) | (registers.getF() & 0xF0);
+            registers.decrementSP(2);
+            mmu.write(registers.getSP(), af);
+        }, 16));
     }
 }
