@@ -128,6 +128,23 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.incrementPC();
     }
 
+    /**
+     * Compare operation - subtracts value from A and sets flags without storing
+     * result
+     * 
+     * @param value The value to compare with register A
+     */
+    private void cp(int value) {
+        int a = registers.getA();
+        int result = a - value;
+
+        // Set flags
+        registers.setFlagZ((result & 0xFF) == 0); // Zero flag
+        registers.setFlagN(true); // Subtract flag (always set for CP)
+        registers.setFlagH((a & 0xF) < (value & 0xF)); // Half carry flag
+        registers.setFlagC(result < 0); // Carry flag (borrow)
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         // ===== 8-bit ADD instructions =====
@@ -206,6 +223,64 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0xDE, wrap(() -> { // SBC A, d8
             int value = readImmediate8();
             sbc8(value);
+        }, 8));
+
+        // CP B - Compare A with B
+        functions.put(0xB8, wrap(() -> {
+            cp(registers.getB());
+            registers.incrementPC();
+        }, 4));
+
+        // CP C - Compare A with C
+        functions.put(0xB9, wrap(() -> {
+            cp(registers.getC());
+            registers.incrementPC();
+        }, 4));
+
+        // CP D - Compare A with D
+        functions.put(0xBA, wrap(() -> {
+            cp(registers.getD());
+            registers.incrementPC();
+        }, 4));
+
+        // CP E - Compare A with E
+        functions.put(0xBB, wrap(() -> {
+            cp(registers.getE());
+            registers.incrementPC();
+        }, 4));
+
+        // CP H - Compare A with H
+        functions.put(0xBC, wrap(() -> {
+            cp(registers.getH());
+            registers.incrementPC();
+        }, 4));
+
+        // CP L - Compare A with L
+        functions.put(0xBD, wrap(() -> {
+            cp(registers.getL());
+            registers.incrementPC();
+        }, 4));
+
+        // CP (HL) - Compare A with value at address HL
+        functions.put(0xBE, wrap(() -> {
+            int address = registers.getHL();
+            int value = mmu.read(address) & 0xFF;
+            cp(value);
+            registers.incrementPC();
+        }, 8));
+
+        // CP A - Compare A with A
+        functions.put(0xBF, wrap(() -> {
+            cp(registers.getA());
+            registers.incrementPC();
+        }, 4));
+
+        // CP d8 - Compare A with immediate 8-bit value
+        functions.put(0xFE, wrap(() -> {
+            registers.incrementPC();
+            int value = mmu.read(registers.getPC()) & 0xFF;
+            cp(value);
+            registers.incrementPC();
         }, 8));
 
     }
