@@ -7,7 +7,8 @@ import gb_emu.ui.Screen;
 public class App {
     public static void main(String[] args) {
         String filePath = "/home/hugo-guimar-es/roms/gb/Tetris (World).gb";
-        Cartridge cartridge = new Cartridge(filePath);
+        String botRomPath ="/home/hugo-guimar-es/roms/gb/bootix_dmg.bin";
+        Cartridge cartridge = new Cartridge(filePath, botRomPath);
         System.out.println(cartridge.getCartridgeType());
 
         GameBoy gameBoy = new GameBoy(cartridge);

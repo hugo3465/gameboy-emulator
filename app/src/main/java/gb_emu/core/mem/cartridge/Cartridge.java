@@ -9,16 +9,32 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gb_emu.core.mem.RAM;
+
 public class Cartridge implements Serializable {
-    public static final Logger LOGGER = LoggerFactory.getLogger(Cartridge.class); 
+    public static final Logger LOGGER = LoggerFactory.getLogger(Cartridge.class);
 
-    private byte[] romData; // from 0x0000 to 0x7FFF
+    private boolean gbc;
+    private byte[] romData;
+    private byte[] botRom;
+    private RAM externalRAM;
 
-    public Cartridge(String romPath) {
+    public Cartridge(String romPath, String botRomPath) {
         this.romData = loadFile(romPath);
+        this.botRom = loadFile(botRomPath);
+        this.gbc = false;
 
+        int externalRamSize = getRAMSize(); // KiB
+        if (externalRamSize > 0) {
+            this.externalRAM = new RAM(externalRamSize * 1024, 0xA000);
+        } else {
+            this.externalRAM = null;
+        }
+
+        LOGGER.debug("External RAM size: " + externalRamSize * 1024);
         LOGGER.debug("ROM size: " + romData.length);
         LOGGER.debug("ROM @ 0x100: 0x%02X\n", Byte.toUnsignedInt(romData[0x100]));
+
     }
 
     /**
@@ -167,14 +183,31 @@ public class Cartridge implements Serializable {
     }
 
     public int read(int address) {
-        if (address >= 0x0000 && address <= 0x7FFF) {
+        if (!gbc && address >= 0x0000 && address < 0x0100) {
+            return Byte.toUnsignedInt(botRom[address]);
+        } else if (address == 0xFF50) {
+            return 0xFF;
+        } else if (address >= 0xA000 && address <= 0xBFFF) {
+            if (externalRAM == null) {
+                LOGGER.warn("Attempted to read from non-existent external RAM at 0x" + Integer.toHexString(address));
+                return 0xFF;
+            }
+            return externalRAM.read(address);
+        } else {
             return Byte.toUnsignedInt(romData[address]);
         }
-        return 0xFF;
     }
 
     public void write(int address, int value) {
-        // ROM_ONLY does nothing for write operatoins
+        if (address >= 0xA000 && address <= 0xBFFF) {
+            if (externalRAM == null) {
+                LOGGER.warn("Attempted to write to non-existent external RAM at 0x" + Integer.toHexString(address));
+                return;
+            }
+            externalRAM.write(address, value);
+        }
+
+        // MBC's here in the future
     }
 
     public byte[] getRomData() {
