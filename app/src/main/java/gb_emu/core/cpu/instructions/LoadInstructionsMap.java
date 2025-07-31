@@ -1,6 +1,9 @@
 package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import gb_emu.core.Instruction;
 import gb_emu.core.cpu.CPU;
@@ -20,297 +23,149 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         return (high << 8) | low;
     }
 
+    private void ld_r_n(Consumer<Integer> setter, int value) {
+        setter.accept(value);
+        registers.incrementPC();
+    }
+
+    private void ld_r_r(Consumer<Integer> setter, Supplier<Integer> getter) {
+        int value = getter.get();
+        setter.accept(value);
+    }
+
+    private void ld_r_pair(Consumer<Integer> setter, Supplier<Integer> getPair) {
+        int pair = getPair.get();
+        int value = mmu.read(pair);
+        registers.setB(value);
+    }
+
+    private void ld_pair_r(Supplier<Integer> getPair, Supplier<Integer> getReg) {
+        int pair = getPair.get();
+        int value = getReg.get();
+        mmu.write(pair, value);
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         /**
          * LD
          */
 
-        functions.put(0x02, wrap(() -> {
-            mmu.write(registers.getBC(), registers.getA());
-            registers.incrementPC(); // opcode 1 byte
-        }, 8)); // LD (BC), A
-
-        functions.put(0x12, wrap(() -> {
-            mmu.write(registers.getDE(), registers.getA());
-            registers.incrementPC();
-        }, 8)); // LD (DE), A
-
         // LD B, r
-        functions.put(0x06, wrap(() -> {
-            registers.setB(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD B, d8
 
-        functions.put(0x40, wrap(() -> {
-            registers.setB(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD B, B
+        functions.put(0x06, wrap(() -> ld_r_n(registers::setB, readImmediate8()), 8)); // LD B, d8
 
-        functions.put(0x41, wrap(() -> {
-            registers.setB(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD B, C
+        functions.put(0x40, wrap(() -> ld_r_r(registers::setB, registers::getB), 4)); // LD B, B
 
-        functions.put(0x42, wrap(() -> {
-            registers.setB(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD B, D
+        functions.put(0x41, wrap(() -> ld_r_r(registers::setB, registers::getC), 4)); // LD B, C
 
-        functions.put(0x43, wrap(() -> {
-            registers.setB(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD B, E
+        functions.put(0x42, wrap(() -> ld_r_r(registers::setB, registers::getD), 4)); // LD B, D
 
-        functions.put(0x44, wrap(() -> {
-            registers.setB(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD B, H
+        functions.put(0x43, wrap(() -> ld_r_r(registers::setB, registers::getE), 4)); // LD B, E
 
-        functions.put(0x45, wrap(() -> {
-            registers.setB(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD B, L
+        functions.put(0x44, wrap(() -> ld_r_r(registers::setB, registers::getH), 4)); // LD B, H
 
-        functions.put(0x46, wrap(() -> {
-            registers.setB(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD B, (HL)
+        functions.put(0x45, wrap(() -> ld_r_r(registers::setB, registers::getL), 4)); // LD B, L
 
-        functions.put(0x47, wrap(() -> {
-            registers.setB(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD B, A
+        functions.put(0x46, wrap(() -> ld_r_pair(registers::setB, registers::getHL), 8)); // LD B, (HL)
+
+        functions.put(0x47, wrap(() -> ld_r_r(registers::setB, registers::getA), 4)); // LD B, A
 
         // LD C, r
-        functions.put(0x0E, wrap(() -> {
-            registers.setC(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD C, d8
 
-        functions.put(0x48, wrap(() -> {
-            registers.setC(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD C, B
+        functions.put(0x0E, wrap(() -> ld_r_n(registers::setC, readImmediate8()), 8)); // LD C, d8
 
-        functions.put(0x49, wrap(() -> {
-            registers.setC(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD C, C
+        functions.put(0x48, wrap(() -> ld_r_r(registers::setC, registers::getB), 4)); // LD C, B
 
-        functions.put(0x4A, wrap(() -> {
-            registers.setC(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD C, D
+        functions.put(0x49, wrap(() -> ld_r_r(registers::setC, registers::getC), 4)); // LD C, C
 
-        functions.put(0x4B, wrap(() -> {
-            registers.setC(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD C, E
+        functions.put(0x4A, wrap(() -> ld_r_r(registers::setC, registers::getD), 4)); // LD C, D
 
-        functions.put(0x4C, wrap(() -> {
-            registers.setC(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD C, H
+        functions.put(0x4B, wrap(() -> ld_r_r(registers::setC, registers::getE), 4)); // LD C, E
 
-        functions.put(0x4D, wrap(() -> {
-            registers.setC(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD C, L
+        functions.put(0x4C, wrap(() -> ld_r_r(registers::setC, registers::getH), 4)); // LD C, H
 
-        functions.put(0x4E, wrap(() -> {
-            registers.setC(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD C, (HL)
+        functions.put(0x4D, wrap(() -> ld_r_r(registers::setC, registers::getL), 4)); // LD C, L
 
-        functions.put(0x4F, wrap(() -> {
-            registers.setC(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD C, A
+        functions.put(0x4E, wrap(() -> ld_r_pair(registers::setC, registers::getHL), 8)); // LD C, (HL)
+
+        functions.put(0x4F, wrap(() -> ld_r_r(registers::setC, registers::getA), 4)); // LD C, A
 
         // LD D, r
-        functions.put(0x16, wrap(() -> {
-            registers.setD(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD D, d8
+        functions.put(0x16, wrap(() -> ld_r_n(registers::setD, readImmediate8()), 8)); // LD D, d8
 
-        functions.put(0x50, wrap(() -> {
-            registers.setD(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD D, B
+        functions.put(0x50, wrap(() -> ld_r_r(registers::setD, registers::getB), 4)); // LD D, B
 
-        functions.put(0x51, wrap(() -> {
-            registers.setD(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD D, C
+        functions.put(0x51, wrap(() -> ld_r_r(registers::setD, registers::getC), 4)); // LD D, C
 
-        functions.put(0x52, wrap(() -> {
-            registers.setD(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD D, D
+        functions.put(0x52, wrap(() -> ld_r_r(registers::setD, registers::getD), 4)); // LD D, D
 
-        functions.put(0x53, wrap(() -> {
-            registers.setD(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD D, E
+        functions.put(0x53, wrap(() -> ld_r_r(registers::setD, registers::getE), 4)); // LD D, E
 
-        functions.put(0x54, wrap(() -> {
-            registers.setD(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD D, H
+        functions.put(0x54, wrap(() -> ld_r_r(registers::setD, registers::getH), 4)); // LD D, H
 
-        functions.put(0x55, wrap(() -> {
-            registers.setD(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD D, L
+        functions.put(0x55, wrap(() -> ld_r_r(registers::setD, registers::getL), 4)); // LD D, L
 
-        functions.put(0x56, wrap(() -> {
-            registers.setD(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD D, (HL)
+        functions.put(0x56, wrap(() -> ld_r_pair(registers::setD, registers::getHL), 8)); // LD D, (HL)
 
-        functions.put(0x57, wrap(() -> {
-            registers.setD(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD D, A
+        functions.put(0x57, wrap(() -> ld_r_r(registers::setD, registers::getA), 4)); // LD D, A
 
         // LD E, r
-        functions.put(0x1E, wrap(() -> {
-            registers.setE(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD E, d8
+        functions.put(0x1E, wrap(() -> ld_r_n(registers::setE, readImmediate8()), 8)); // LD E, d8
 
-        functions.put(0x58, wrap(() -> {
-            registers.setE(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD E, B
+        functions.put(0x58, wrap(() -> ld_r_r(registers::setE, registers::getB), 4)); // LD E, B
 
-        functions.put(0x59, wrap(() -> {
-            registers.setE(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD E, C
+        functions.put(0x59, wrap(() -> ld_r_r(registers::setE, registers::getC), 4)); // LD E, C
 
-        functions.put(0x5A, wrap(() -> {
-            registers.setE(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD E, D
+        functions.put(0x5A, wrap(() -> ld_r_r(registers::setE, registers::getD), 4)); // LD E, D
 
-        functions.put(0x5B, wrap(() -> {
-            registers.setE(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD E, E
+        functions.put(0x5B, wrap(() -> ld_r_r(registers::setE, registers::getE), 4)); // LD E, E
 
-        functions.put(0x5C, wrap(() -> {
-            registers.setE(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD E, H
+        functions.put(0x5C, wrap(() -> ld_r_r(registers::setE, registers::getH), 4)); // LD E, H
 
-        functions.put(0x5D, wrap(() -> {
-            registers.setE(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD E, L
+        functions.put(0x5D, wrap(() -> ld_r_r(registers::setE, registers::getL), 4)); // LD E, L
 
-        functions.put(0x5E, wrap(() -> {
-            registers.setE(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD E, (HL)
+        functions.put(0x5E, wrap(() -> ld_r_pair(registers::setE, registers::getHL), 8)); // LD E, (HL)
 
-        functions.put(0x5F, wrap(() -> {
-            registers.setE(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD E, A
+        functions.put(0x5F, wrap(() -> ld_r_r(registers::setE, registers::getA), 4)); // LD E, A
 
         // LD H, r
-        functions.put(0x26, wrap(() -> {
-            registers.setH(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD H, d8
+        functions.put(0x26, wrap(() -> ld_r_n(registers::setH, readImmediate8()), 8)); // LD H, d8
 
-        functions.put(0x60, wrap(() -> {
-            registers.setH(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD H, B
+        functions.put(0x60, wrap(() -> ld_r_r(registers::setH, registers::getB), 4)); // LD H, B
 
-        functions.put(0x61, wrap(() -> {
-            registers.setH(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD H, C
+        functions.put(0x61, wrap(() -> ld_r_r(registers::setH, registers::getC), 4)); // LD H, C
 
-        functions.put(0x62, wrap(() -> {
-            registers.setH(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD H, D
+        functions.put(0x62, wrap(() -> ld_r_r(registers::setH, registers::getD), 4)); // LD H, D
 
-        functions.put(0x63, wrap(() -> {
-            registers.setH(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD H, E
+        functions.put(0x63, wrap(() -> ld_r_r(registers::setH, registers::getE), 4)); // LD H, E
 
-        functions.put(0x64, wrap(() -> {
-            registers.setH(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD H, H
+        functions.put(0x64, wrap(() -> ld_r_r(registers::setH, registers::getH), 4)); // LD H, H
 
-        functions.put(0x65, wrap(() -> {
-            registers.setH(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD H, L
+        functions.put(0x65, wrap(() -> ld_r_r(registers::setH, registers::getL), 4)); // LD H, L
 
-        functions.put(0x66, wrap(() -> {
-            registers.setH(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD H, (HL)
+        functions.put(0x66, wrap(() -> ld_r_pair(registers::setH, registers::getHL), 8)); // LD H, (HL)
 
-        functions.put(0x67, wrap(() -> {
-            registers.setH(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD H, A
+        functions.put(0x67, wrap(() -> ld_r_r(registers::setH, registers::getA), 4)); // LD H, A
 
         // LD L, r
-        functions.put(0x2E, wrap(() -> {
-            registers.setL(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD L, d8
+        functions.put(0x2E, wrap(() -> ld_r_n(registers::setL, readImmediate8()), 8)); // LD L, d8
 
-        functions.put(0x68, wrap(() -> {
-            registers.setL(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD L, B
+        functions.put(0x68, wrap(() -> ld_r_r(registers::setL, registers::getB), 4)); // LD L, B
 
-        functions.put(0x69, wrap(() -> {
-            registers.setL(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD L, C
+        functions.put(0x69, wrap(() -> ld_r_r(registers::setL, registers::getC), 4)); // LD L, C
+        
+        functions.put(0x6A, wrap(() -> ld_r_r(registers::setL, registers::getD), 4)); // LD L, D
 
-        functions.put(0x6A, wrap(() -> {
-            registers.setL(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD L, D
+        functions.put(0x6B, wrap(() -> ld_r_r(registers::setL, registers::getE), 4)); // LD L, E
 
-        functions.put(0x6B, wrap(() -> {
-            registers.setL(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD L, E
+        functions.put(0x6C, wrap(() -> ld_r_r(registers::setL, registers::getH), 4)); // LD L, H
 
-        functions.put(0x6C, wrap(() -> {
-            registers.setL(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD L, H
+        functions.put(0x6D, wrap(() -> ld_r_r(registers::setL, registers::getL), 4)); // LD L, L
 
-        functions.put(0x6D, wrap(() -> {
-            registers.setL(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD L, L
+        functions.put(0x6E, wrap(() -> ld_r_pair(registers::setL, registers::getHL), 8)); // LD L, (HL)
 
-        functions.put(0x6E, wrap(() -> {
-            registers.setL(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD L, (HL)
-
-        functions.put(0x6F, wrap(() -> {
-            registers.setL(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD L, A
+        functions.put(0x6F, wrap(() -> ld_r_r(registers::setL, registers::getA), 4)); // LD L, A
 
         // LD (HL), r
         functions.put(0x36, wrap(() -> {
@@ -318,91 +173,46 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.incrementPC();
         }, 12)); // LD (HL), d8
 
-        functions.put(0x70, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getB());
-            registers.incrementPC();
-        }, 8)); // LD (HL), B
+        functions.put(0x70, wrap(() -> ld_pair_r(registers::getHL, registers::getB), 8)); // LD (HL), B
 
-        functions.put(0x71, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getC());
-            registers.incrementPC();
-        }, 8)); // LD (HL), C
+        functions.put(0x71, wrap(() -> ld_pair_r(registers::getHL, registers::getC), 8)); // LD (HL), C
 
-        functions.put(0x72, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getD());
-            registers.incrementPC();
-        }, 8)); // LD (HL), D
+        functions.put(0x72, wrap(() -> ld_pair_r(registers::getHL, registers::getD), 8)); // LD (HL), D
 
-        functions.put(0x73, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getE());
-            registers.incrementPC();
-        }, 8)); // LD (HL), E
+        functions.put(0x73, wrap(() -> ld_pair_r(registers::getHL, registers::getE), 8)); // LD (HL), E
 
-        functions.put(0x74, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getH());
-            registers.incrementPC();
-        }, 8)); // LD (HL), H
+        functions.put(0x74, wrap(() -> ld_pair_r(registers::getHL, registers::getH), 8)); // LD (HL), H
 
-        functions.put(0x75, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getL());
-            registers.incrementPC();
-        }, 8)); // LD (HL), L
+        functions.put(0x75, wrap(() -> ld_pair_r(registers::getHL, registers::getL), 8)); // LD (HL), L
 
-        functions.put(0x77, wrap(() -> {
-            mmu.write(registers.getHL(), registers.getA());
-            registers.incrementPC();
-        }, 8)); // LD (HL), A
+        functions.put(0x77, wrap(() -> ld_pair_r(registers::getHL, registers::getA), 8)); // LD (HL), A
 
         // LD A, r
-        functions.put(0x1A, wrap(() -> {
-            registers.setA(mmu.read(registers.getDE()));
-            registers.incrementPC();
-        }, 8)); // LD A, (DE)
+        functions.put(0x1A, wrap(() -> ld_r_pair(registers::setA, registers::getDE), 8)); // LD A, (DE)
 
-        functions.put(0x3E, wrap(() -> {
-            registers.setA(readImmediate8());
-            registers.incrementPC();
-        }, 8)); // LD A, d8
+        functions.put(0x3E, wrap(() -> ld_r_n(registers::setA, readImmediate8()), 8)); // LD A, d8
 
-        functions.put(0x78, wrap(() -> {
-            registers.setA(registers.getB());
-            registers.incrementPC();
-        }, 4)); // LD A, B
+        functions.put(0x78, wrap(() -> ld_r_r(registers::setA, registers::getB), 4)); // LD A, B
 
-        functions.put(0x79, wrap(() -> {
-            registers.setA(registers.getC());
-            registers.incrementPC();
-        }, 4)); // LD A, C
+        functions.put(0x79, wrap(() -> ld_r_r(registers::setA, registers::getC), 4)); // LD A, C
 
-        functions.put(0x7A, wrap(() -> {
-            registers.setA(registers.getD());
-            registers.incrementPC();
-        }, 4)); // LD A, D
+        functions.put(0x7A, wrap(() -> ld_r_r(registers::setA, registers::getD), 4)); // LD A, D
 
-        functions.put(0x7B, wrap(() -> {
-            registers.setA(registers.getE());
-            registers.incrementPC();
-        }, 4)); // LD A, E
+        functions.put(0x7B, wrap(() -> ld_r_r(registers::setA, registers::getE), 4)); // LD A, E
 
-        functions.put(0x7C, wrap(() -> {
-            registers.setA(registers.getH());
-            registers.incrementPC();
-        }, 4)); // LD A, H
+        functions.put(0x7C, wrap(() -> ld_r_r(registers::setA, registers::getH), 4)); // LD A, H
 
-        functions.put(0x7D, wrap(() -> {
-            registers.setA(registers.getL());
-            registers.incrementPC();
-        }, 4)); // LD A, L
+        functions.put(0x7D, wrap(() -> ld_r_r(registers::setA, registers::getL), 4)); // LD A, L
 
-        functions.put(0x7E, wrap(() -> {
-            registers.setA(mmu.read(registers.getHL()));
-            registers.incrementPC();
-        }, 8)); // LD A, (HL)
+        functions.put(0x7E, wrap(() -> ld_r_pair(registers::setA, registers::getHL), 8)); // LD A, (HL)
 
-        functions.put(0x7F, wrap(() -> {
-            registers.setA(registers.getA());
-            registers.incrementPC();
-        }, 4)); // LD A, A
+        functions.put(0x7F, wrap(() -> ld_r_r(registers::setA, registers::getA), 4)); // LD A, A
+
+        // LD (BC), r
+        functions.put(0x02, wrap(() -> ld_pair_r(registers::getBC, registers::getA), 8)); // LD (BC), A
+
+        // LD (DE), r
+        functions.put(0x12, wrap(() -> ld_pair_r(registers::getDE, registers::getA), 8)); // LD (DE), A
 
         // ===== Special LD instructions =====
         functions.put(0x22, wrap(() -> { // LD (HL+), A
@@ -524,25 +334,24 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.incrementPC();
         }, 8));
 
-        
+        /**
+         * POP
+         */
         functions.put(0xC1, wrap(() -> { // POP BC
             int value = pop16();
             registers.setBC(value);
         }, 12));
 
-        
         functions.put(0xD1, wrap(() -> { // POP DE
             int value = pop16();
             registers.setDE(value);
         }, 12));
 
-        
         functions.put(0xE1, wrap(() -> { // POP HL
             int value = pop16();
             registers.setHL(value);
         }, 12));
 
-        
         functions.put(0xF1, wrap(() -> { // POP AF
             int value = pop16();
             registers.setAF(value & 0xFFF0); // clear AF registers
