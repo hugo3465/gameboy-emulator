@@ -12,6 +12,14 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         super(cpu, registers, mmu);
     }
 
+    private int pop16() {
+        int low = mmu.read(registers.getSP()) & 0xFF;
+        registers.incrementSP();
+        int high = mmu.read(registers.getSP()) & 0xFF;
+        registers.incrementSP();
+        return (high << 8) | low;
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         /**
@@ -515,5 +523,30 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.setSP(registers.getHL());
             registers.incrementPC();
         }, 8));
+
+        
+        functions.put(0xC1, wrap(() -> { // POP BC
+            int value = pop16();
+            registers.setBC(value);
+        }, 12));
+
+        
+        functions.put(0xD1, wrap(() -> { // POP DE
+            int value = pop16();
+            registers.setDE(value);
+        }, 12));
+
+        
+        functions.put(0xE1, wrap(() -> { // POP HL
+            int value = pop16();
+            registers.setHL(value);
+        }, 12));
+
+        
+        functions.put(0xF1, wrap(() -> { // POP AF
+            int value = pop16();
+            registers.setAF(value & 0xFFF0); // clear AF registers
+        }, 12));
+
     }
 }
