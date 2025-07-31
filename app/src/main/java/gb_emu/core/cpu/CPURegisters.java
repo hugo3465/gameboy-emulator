@@ -192,8 +192,20 @@ public class CPURegisters {
         this.pc = (pc + value) & 0xffff; // ensure 16 bit
     }
 
-    public void decrementPC() {
+    public void decrementPD() {
         this.pc = (pc - 1) & 0xffff;
+    }
+
+    public void incrementSP() {
+        this.sp = (sp + 1) & 0xffff; // ensure 16 bit
+    }
+
+    public void incrementSP(int value) {
+        this.sp = (sp + value) & 0xffff; // ensure 16 bit
+    }
+
+    public void decrementSP() {
+        this.sp = (sp - 1) & 0xffff;
     }
 
     public void setRegister(String name, int value) {
