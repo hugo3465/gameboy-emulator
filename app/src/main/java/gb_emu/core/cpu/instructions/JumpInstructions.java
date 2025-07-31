@@ -112,8 +112,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
 
             registers.setFlagN(true);
             registers.setFlagH(true);
-
-            registers.incrementPC();
         }, 4));
 
         /**
