@@ -145,6 +145,17 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(result < 0); // Carry flag (borrow)
     }
 
+    private void xor(int value) {
+        int result = registers.getA() ^ value;
+        registers.setA(result);
+
+        // Set flags
+        registers.setFlagZ(result == 0);
+        registers.setFlagN(false);
+        registers.setFlagH(false);
+        registers.setFlagC(false);
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         // ===== 8-bit ADD instructions =====
@@ -281,6 +292,36 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
             int value = mmu.read(registers.getPC()) & 0xFF;
             cp(value);
             registers.incrementPC();
+        }, 8));
+
+        // XOR A, B
+        functions.put(0xA8, wrap(() -> xor(registers.getB()), 4));
+
+        // XOR A, C
+        functions.put(0xA9, wrap(() -> xor(registers.getC()), 4));
+
+        // XOR A, D
+        functions.put(0xAA, wrap(() -> xor(registers.getD()), 4));
+
+        // XOR A, E
+        functions.put(0xAB, wrap(() -> xor(registers.getE()), 4));
+
+        // XOR A, H
+        functions.put(0xAC, wrap(() -> xor(registers.getH()), 4));
+
+        // XOR A, L
+        functions.put(0xAD, wrap(() -> xor(registers.getL()), 4));
+
+        // XOR A, (HL)
+        functions.put(0xAE, wrap(() -> xor(mmu.read(registers.getHL())), 8));
+
+        // XOR A, A
+        functions.put(0xAF, wrap(() -> xor(registers.getA()), 4));
+
+        // XOR A, d8 (immediate 8-bit)
+        functions.put(0xEE, wrap(() -> {
+            int value = readImmediate8();
+            xor(value);
         }, 8));
 
     }
