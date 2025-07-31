@@ -28,5 +28,18 @@ public class BitInstructions extends AbstractInstruction implements InstructionS
             registers.incrementPC();
         }, 4));
 
+        functions.put(0x07, wrap(() -> { // RLCA
+            int a = registers.getA();
+            boolean carry = (a & 0x80) != 0;
+            int result = ((a << 1) & 0xFF) | (carry ? 1 : 0);
+
+            registers.setA(result);
+            registers.setFlagZ(false);
+            registers.setFlagN(false);
+            registers.setFlagH(false);
+            registers.setFlagC(carry);
+
+            registers.incrementPC();
+        }, 4));
     }
 }

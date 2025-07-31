@@ -17,6 +17,7 @@ public class InstructionsMap {
         new IncDecInstructions(cpu, registers, mmu).registerAll(functions);
         new JumpInstructions(cpu, registers, mmu).registerAll(functions);
         new MiscInstructions(cpu, registers, mmu).registerAll(functions);
+        new BitInstructions(cpu, registers, mmu).registerAll(functions);
 
         new PrefixCBInstructions(cpu, registers, mmu).registerAll(prefixFunctions);
     }
