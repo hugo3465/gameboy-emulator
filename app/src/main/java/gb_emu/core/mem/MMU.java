@@ -20,6 +20,8 @@ public class MMU {
     private RAM wram; // Work RAM
     private RAM hram; // High RAM
     private byte interruptEnable = 0;
+    private boolean bootRomEnabled = true;
+    private byte[] bootRom = new byte[256]; // posso ler de um ficheiro ou hardcode
 
     // Not implemented
     // private Registers registers; // acho que não coloquei os registers certos,
@@ -31,9 +33,17 @@ public class MMU {
 
         this.wram = new RAM(WORK_RAM_LENGHT, WORK_RAM_OFFSET);
         this.hram = new RAM(HIGH_RAM_LENGHT, HIGH_RAM_OFFSET);
+
+        // Exemplo: carregar a boot ROM a partir de ficheiro
+        // this.bootRom = loadBootRom("path/to/bootrom.bin");
+        loadBootRom();
     }
 
     public int read(int address) {
+        if (bootRomEnabled && address >= 0x0000 && address <= 0x00FF) {
+            return Byte.toUnsignedInt(bootRom[address]);
+        }
+
         if (address >= 0x0000 && address <= 0x7FFF) {
             return cartridge.read(address);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
@@ -60,6 +70,11 @@ public class MMU {
     public void write(int address, int value) {
         value &= 0xFF; // guarantees 8-bit value
 
+        if (address == 0xFF50 && value == 1) {
+            bootRomEnabled = false;
+            return;
+        }
+
         if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
@@ -79,5 +94,15 @@ public class MMU {
         } else if (address == 0xFFFF) {
             interruptEnable = (byte) value;
         }
+    }
+
+    private void loadBootRom() {
+        // Exemplo de bytes mínimos para inicializar LCDC e outros registos
+        bootRom = new byte[256];
+        bootRom[0x40] = (byte) 0x91; // LCDC
+        bootRom[0x42] = 0; // SCY
+        bootRom[0x43] = 0; // SCX
+        bootRom[0x47] = (byte) 0xFC; // BGP (background palette)
+        // resto dos bytes podem ser 0
     }
 }

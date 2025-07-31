@@ -31,6 +31,12 @@ public class PPU {
         this.screen = new Screen();
         this.registers = new PPURegisters();
         this.bgPalette = new Palette();
+
+        // Inicializar os registos essenciais para o LCD funcionar
+        registers.setLCDC(0x91); // LCDC ligado, background habilitado
+        registers.setSCY(0); // Scroll Y
+        registers.setSCX(0); // Scroll X
+        registers.setBGP(0xFC); // Palette padrão para background
     }
 
     public void step(int cycles) {
@@ -77,12 +83,6 @@ public class PPU {
                     registers.setLY(line);
                 }
                 break;
-        }
-
-        // TODO TEMPORÁRIO: simula renderização de todas as linhas (ignora timing real)
-        for (int i = 0; i < 144; i++) {
-            registers.setLY(i);
-            renderScanline();
         }
     }
 
