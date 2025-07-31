@@ -156,6 +156,30 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(false);
     }
 
+    private void and(int value) {
+        int result = registers.getA() & value;
+        registers.setA(result);
+
+        registers.setFlagZ(result == 0);
+        registers.setFlagN(false);
+        registers.setFlagH(true);
+        registers.setFlagC(false);
+
+        registers.incrementPC();
+    }
+
+    private void or(int value) {
+        int result = registers.getA() | value;
+        registers.setA(result);
+
+        registers.setFlagZ(result == 0);
+        registers.setFlagN(false);
+        registers.setFlagH(false);
+        registers.setFlagC(false);
+
+        registers.incrementPC();
+    }
+
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         // ===== 8-bit ADD instructions =====
@@ -294,32 +318,61 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
             registers.incrementPC();
         }, 8));
 
-        // XOR A, B
-        functions.put(0xA8, wrap(() -> xor(registers.getB()), 4));
+        /**
+         * AND
+         */
+        functions.put(0xA0, wrap(() -> and(registers.getB()), 4)); // AND A, B
+        functions.put(0xA1, wrap(() -> and(registers.getC()), 4)); // AND A, C
+        functions.put(0xA2, wrap(() -> and(registers.getD()), 4)); // AND A, D
+        functions.put(0xA3, wrap(() -> and(registers.getE()), 4)); // AND A, E
+        functions.put(0xA4, wrap(() -> and(registers.getH()), 4)); // AND A, H
+        functions.put(0xA5, wrap(() -> and(registers.getL()), 4)); // AND A, L
+        functions.put(0xA6, wrap(() -> and(mmu.read(registers.getHL())), 8)); // AND A, (HL)
+        functions.put(0xA7, wrap(() -> and(registers.getA()), 4)); // AND A, A
 
-        // XOR A, C
-        functions.put(0xA9, wrap(() -> xor(registers.getC()), 4));
+        functions.put(0xE6, wrap(() -> { // AND A, d8
+            int value = readImmediate8();
+            and(value);
+        }, 8));
 
-        // XOR A, D
-        functions.put(0xAA, wrap(() -> xor(registers.getD()), 4));
+        /**
+         * OR
+         */
+        functions.put(0xB0, wrap(() -> or(registers.getB()), 4)); // OR A, B
+        functions.put(0xB1, wrap(() -> or(registers.getC()), 4)); // OR A, C
+        functions.put(0xB2, wrap(() -> or(registers.getD()), 4)); // OR A, D
+        functions.put(0xB3, wrap(() -> or(registers.getE()), 4)); // OR A, E
+        functions.put(0xB4, wrap(() -> or(registers.getH()), 4)); // OR A, H
+        functions.put(0xB5, wrap(() -> or(registers.getL()), 4)); // OR A, L
+        functions.put(0xB6, wrap(() -> or(mmu.read(registers.getHL())), 8)); // OR A, (HL)
+        functions.put(0xB7, wrap(() -> or(registers.getA()), 4)); // OR A, A
 
-        // XOR A, E
-        functions.put(0xAB, wrap(() -> xor(registers.getE()), 4));
+        functions.put(0xF6, wrap(() -> { // OR A, d8
+            int value = readImmediate8();
+            or(value);
+        }, 8));
 
-        // XOR A, H
-        functions.put(0xAC, wrap(() -> xor(registers.getH()), 4));
+        /**
+         * XOR
+         */
 
-        // XOR A, L
-        functions.put(0xAD, wrap(() -> xor(registers.getL()), 4));
+        functions.put(0xA8, wrap(() -> xor(registers.getB()), 4)); // XOR A, B
 
-        // XOR A, (HL)
-        functions.put(0xAE, wrap(() -> xor(mmu.read(registers.getHL())), 8));
+        functions.put(0xA9, wrap(() -> xor(registers.getC()), 4)); // XOR A, C
 
-        // XOR A, A
-        functions.put(0xAF, wrap(() -> xor(registers.getA()), 4));
+        functions.put(0xAA, wrap(() -> xor(registers.getD()), 4)); // XOR A, D
 
-        // XOR A, d8 (immediate 8-bit)
-        functions.put(0xEE, wrap(() -> {
+        functions.put(0xAB, wrap(() -> xor(registers.getE()), 4)); // XOR A, E
+
+        functions.put(0xAC, wrap(() -> xor(registers.getH()), 4)); // XOR A, H
+
+        functions.put(0xAD, wrap(() -> xor(registers.getL()), 4)); // XOR A, L
+
+        functions.put(0xAE, wrap(() -> xor(mmu.read(registers.getHL())), 8)); // XOR A, (HL)
+
+        functions.put(0xAF, wrap(() -> xor(registers.getA()), 4)); // XOR A, A
+
+        functions.put(0xEE, wrap(() -> { // XOR A, d8 (immediate 8-bit)
             int value = readImmediate8();
             xor(value);
         }, 8));
