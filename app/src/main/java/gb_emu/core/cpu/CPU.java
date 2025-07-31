@@ -41,11 +41,12 @@ public class CPU implements Serializable {
             }
         }
 
-        int pcBefore = registers.getPC();
-        int opcode = mmu.read(pcBefore);
+        int pc = registers.getPC();
+        int opcode = mmu.read(pc);
+        registers.incrementPC();
 
         LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
-        LOGGER.debug("PC: " + String.format("0x%04X", pcBefore));
+        LOGGER.debug("PC: " + String.format("0x%04X", pc));
 
         int cycles = instructionsMap.execute(opcode);
 
