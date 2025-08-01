@@ -2,7 +2,7 @@ package gb_emu.core.cpu;
 
 public class CPURegisters {
     private static final int STACK_POINTER_INITIAL_ADDRESS = 0xfffe;
-    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0100;
+    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0000; // start at 0x0100
     private static final int AF_INITIAL_ADDRESS = 0x01b0;
     private static final int BC_INITIAL_ADDRESS = 0x0013;
     private static final int DE_INITIAL_ADDRESS = 0x00d8;
@@ -27,6 +27,7 @@ public class CPURegisters {
     private boolean nf; // subtraction flag
     private boolean cf; // carry flag
     private boolean hf; // half carry flag
+    private boolean halt;
 
     public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
@@ -182,6 +183,14 @@ public class CPURegisters {
         nf = (f & 0x40) != 0;
         hf = (f & 0x20) != 0;
         cf = (f & 0x10) != 0;
+    }
+
+    public boolean getHalt() {
+        return halt;
+    }
+
+    public void setHalt(boolean value) {
+        halt = value;
     }
 
     public void incrementPC() {

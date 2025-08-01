@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gb_emu.core.cpu.CPU;
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
 import gb_emu.core.mem.RAM;
 import gb_emu.core.mem.cartridge.Cartridge;
@@ -20,9 +21,11 @@ public class GameBoy {
 
     public GameBoy(Cartridge cartridge) {
         this.cartridge = cartridge;
+        
+        CPURegisters registers = new CPURegisters();
         this.ppu = new PPU();
         this.mmu = new MMU(cartridge, ppu);
-        this.cpu = new CPU(this, mmu);
+        this.cpu = new CPU(mmu, registers);
     }
 
     public void start() {

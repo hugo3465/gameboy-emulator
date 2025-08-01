@@ -5,62 +5,57 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gb_emu.core.GameBoy;
 import gb_emu.core.cpu.instructions.InstructionsMap;
 import gb_emu.core.mem.MMU;
 
 public class CPU implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CPU.class);
 
-    private GameBoy gb;
     private CPURegisters registers;
     private MMU mmu;
     private InstructionsMap instructionsMap;
     private boolean stopped = false;
-    private boolean halted = false;
     private boolean interruptsEnabled = true;
 
-    public CPU(GameBoy gb, MMU mmu) {
-        this.gb = gb;
+    public CPU(MMU mmu, CPURegisters registers) {
         this.mmu = mmu;
+        this.registers = registers;
 
-        this.registers = new CPURegisters();
         this.instructionsMap = new InstructionsMap(this, mmu, registers);
     }
 
     public int step() {
-        // Check for interrupts that can wake up from STOP/HALT
-        if (stopped || halted) {
-            if (shouldWakeUp()) {
-                stopped = false;
-                halted = false;
-                LOGGER.debug("CPU woke up from STOP/HALT mode");
+        boolean isPrefixCbInstruction = false;
+        boolean halt = registers.getHalt();
+        int opcode = 0x00;
+        int cycles = 0;
+
+        if (!stopped) {
+            if (!halt) {
+                opcode = mmu.read(registers.getPC());
+
+                if (opcode == 0xCB) { // PREFIX
+                    opcode = mmu.read(registers.getPC());
+                    isPrefixCbInstruction = true;
+                    // LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
+                }
+
+                registers.incrementPC();
+                cycles = instructionsMap.execute(opcode, isPrefixCbInstruction);
             } else {
-                // Still stopped/halted, consume minimal cycles
-                return 4;
+                cycles = 1;
+            }
+
+            // Handle Timer (Not implemented)
+
+            // Handle Interrupts
+            if (interruptsEnabled) {
+                handleInterrupts();
             }
         }
 
-        int pc = registers.getPC();
-        int opcode = mmu.read(pc);
-        registers.incrementPC();
-
-        if (opcode == 0xCB) { // PREFIX
-            int cbOpcode = mmu.read(registers.getPC());
-            registers.incrementPC();
-            LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
-            return instructionsMap.execute(cbOpcode, true); // novo método!
-        }
-
-        LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
-        LOGGER.debug("PC: " + String.format("0x%04X", pc));
-
-        int cycles = instructionsMap.execute(opcode, false);
-
-        // Handle interrupts if enabled
-        if (interruptsEnabled) {
-            handleInterrupts();
-        }
+        // LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
+        // LOGGER.debug("PC: " + String.format("0x%04X", pc));
 
         return cycles;
     }
@@ -133,7 +128,8 @@ public class CPU implements Serializable {
                             break; // Joypad
                     }
 
-                    LOGGER.debug("Interrupt {} triggered, jumping to 0x{:02X}", i, registers.getPC());
+                    // LOGGER.debug("Interrupt {} triggered, jumping to 0x{:02X}", i,
+                    // registers.getPC());
                     break;
                 }
             }
@@ -148,23 +144,12 @@ public class CPU implements Serializable {
         this.stopped = stopped;
     }
 
-    public boolean isHalted() {
-        return halted;
-    }
-
-    public void setHalted(boolean halted) {
-        this.halted = halted;
-        if (halted) {
-            LOGGER.debug("CPU entered HALT mode");
-        }
-    }
-
     public boolean isInterruptsEnabled() {
         return interruptsEnabled;
     }
 
     public void setInterruptsEnabled(boolean interruptsEnabled) {
         this.interruptsEnabled = interruptsEnabled;
-        LOGGER.debug("Interrupts {}", interruptsEnabled ? "enabled" : "disabled");
+        // LOGGER.debug("Interrupts {}", interruptsEnabled ? "enabled" : "disabled");
     }
 }
