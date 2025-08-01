@@ -377,5 +377,10 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
             xor(value);
         }, 8));
 
+        functions.put(0x37, wrap(() -> { // SCF
+            registers.setFlagC(true);
+            registers.setFlagN(false);
+            registers.setFlagH(false);
+        }, 4));
     }
 }
