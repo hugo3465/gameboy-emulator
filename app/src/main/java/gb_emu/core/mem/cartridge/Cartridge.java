@@ -30,11 +30,6 @@ public class Cartridge implements Serializable {
         } else {
             this.externalRAM = null;
         }
-
-        LOGGER.debug("External RAM size: " + externalRamSize * 1024);
-        LOGGER.debug("ROM size: " + romData.length);
-        LOGGER.debug("ROM @ 0x100: 0x%02X\n", Byte.toUnsignedInt(romData[0x100]));
-
     }
 
     /**
@@ -189,7 +184,8 @@ public class Cartridge implements Serializable {
             return 0xFF;
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             if (externalRAM == null) {
-                LOGGER.warn("Attempted to read from non-existent external RAM at 0x" + Integer.toHexString(address));
+                // LOGGER.warn("Attempted to read from non-existent external RAM at 0x" +
+                // Integer.toHexString(address));
                 return 0xFF;
             }
             return externalRAM.read(address);
@@ -199,12 +195,15 @@ public class Cartridge implements Serializable {
     }
 
     public void write(int address, int value) {
-        if (address >= 0xA000 && address <= 0xBFFF) {
-            if (externalRAM == null) {
-                LOGGER.warn("Attempted to write to non-existent external RAM at 0x" + Integer.toHexString(address));
-                return;
-            }
+        CartridgeType cartridgeType = getCartridgeType();
+
+        if (address >= 0xA000 && address <= 0xBFFF && externalRAM != null) {
             externalRAM.write(address, value);
+        }
+
+        // MBC0
+        if (cartridgeType == CartridgeType.ROM_ONLY) {
+            return;
         }
 
         // MBC's here in the future

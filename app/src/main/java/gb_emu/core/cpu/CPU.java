@@ -25,39 +25,40 @@ public class CPU implements Serializable {
     }
 
     public int step() {
-        boolean isPrefixCbInstruction = false;
         boolean halt = registers.getHalt();
-        int opcode = 0x00;
         int cycles = 0;
 
         if (!stopped) {
             if (!halt) {
-                opcode = mmu.read(registers.getPC());
-
-                if (opcode == 0xCB) { // PREFIX
-                    opcode = mmu.read(registers.getPC());
-                    isPrefixCbInstruction = true;
-                    // LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
-                }
-
-                registers.incrementPC();
-                cycles = instructionsMap.execute(opcode, isPrefixCbInstruction);
+                cycles = executeInstruction();
             } else {
                 cycles = 1;
             }
 
             // Handle Timer (Not implemented)
 
-            // Handle Interrupts
-            if (interruptsEnabled) {
-                handleInterrupts();
-            }
+            handleInterrupts();
         }
 
         // LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         // LOGGER.debug("PC: " + String.format("0x%04X", pc));
 
         return cycles;
+    }
+
+    private int executeInstruction() {
+        boolean isPrefixCbInstruction = false;
+        int opcode = mmu.read(registers.getPC());
+        registers.incrementPC();
+
+        if (opcode == 0xCB) { // PREFIX CB
+            opcode = mmu.read(registers.getPC());
+            registers.incrementPC();
+            isPrefixCbInstruction = true;
+            // LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
+        }
+
+        return instructionsMap.execute(opcode, isPrefixCbInstruction);
     }
 
     /**
@@ -88,6 +89,10 @@ public class CPU implements Serializable {
      * Handle interrupt processing
      */
     private void handleInterrupts() {
+        if (!interruptsEnabled) {
+            return;
+        }
+
         int interruptEnable = mmu.read(0xFFFF) & 0xFF; // IE register
         int interruptFlags = mmu.read(0xFF0F) & 0xFF; // IF register
 
