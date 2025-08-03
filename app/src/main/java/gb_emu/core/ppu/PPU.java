@@ -10,8 +10,6 @@ import gb_emu.core.ppu.modes.VBlankMode;
 public class PPU {
     private static final int VRAM_CAPACITY = 0x2000; // 8KB
     private static final int VRAM_OFFSET = 0x8000;
-    private static final int OAM_CAPACITY = 0xA0; // 160 bytes
-    private static final int OAM_OFFSET = 0xFE00;
 
     private enum Mode {
         OAM_SEARCH, // 2
@@ -21,7 +19,7 @@ public class PPU {
     }
 
     private RAM vRam;
-    private RAM oam;
+    private OAM oam;
     private Screen screen;
     private PPURegisters registers;
     private Palette bgPalette;
@@ -38,7 +36,7 @@ public class PPU {
 
     public PPU() {
         this.vRam = new RAM(VRAM_CAPACITY, VRAM_OFFSET);
-        this.oam = new RAM(OAM_CAPACITY, OAM_OFFSET);
+        this.oam = new OAM();
         this.screen = new Screen();
         this.registers = new PPURegisters();
         this.bgPalette = new Palette();
