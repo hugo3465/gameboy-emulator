@@ -1,6 +1,11 @@
 package gb_emu.core.ppu;
 
 import gb_emu.core.mem.RAM;
+import gb_emu.core.ppu.modes.HBlankMode;
+import gb_emu.core.ppu.modes.OAMSearchMode;
+import gb_emu.core.ppu.modes.PPUMode;
+import gb_emu.core.ppu.modes.PixelTransferMode;
+import gb_emu.core.ppu.modes.VBlankMode;
 
 public class PPU {
     private static final int VRAM_CAPACITY = 0x2000; // 8KB
@@ -25,12 +30,22 @@ public class PPU {
     private int modeClock = 0;
     private int line = 0;
 
+    // modes
+    private PPUMode oamSearchMode;
+    private PPUMode pixelTransferMode;
+    private PPUMode vBlank;
+    private PPUMode hBlank;
+
     public PPU() {
         this.vRam = new RAM(VRAM_CAPACITY, VRAM_OFFSET);
         this.oam = new RAM(OAM_CAPACITY, OAM_OFFSET);
         this.screen = new Screen();
         this.registers = new PPURegisters();
         this.bgPalette = new Palette();
+        this.oamSearchMode = new OAMSearchMode();
+        this.pixelTransferMode = new PixelTransferMode();
+        this.vBlank = new VBlankMode();
+        this.hBlank = new HBlankMode();
 
         // Inicializar os registos essenciais para o LCD funcionar
         registers.setLCDC(0x91); // LCDC ligado, background habilitado
