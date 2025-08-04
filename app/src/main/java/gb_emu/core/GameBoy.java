@@ -31,7 +31,7 @@ public class GameBoy {
     public void start() {
         while (true) {
             int cycles = cpu.step();
-            ppu.step(cycles);
+            ppu.step();
 
             // try {
             //     Thread.sleep(100);

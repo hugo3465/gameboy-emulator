@@ -1,6 +1,5 @@
 package gb_emu.core.ppu;
 
-import gb_emu.core.mem.RAM;
 import gb_emu.core.ppu.modes.HBlankMode;
 import gb_emu.core.ppu.modes.OAMSearchMode;
 import gb_emu.core.ppu.modes.PPUMode;
@@ -8,9 +7,6 @@ import gb_emu.core.ppu.modes.PixelTransferMode;
 import gb_emu.core.ppu.modes.VBlankMode;
 
 public class PPU {
-    private static final int VRAM_CAPACITY = 0x2000; // 8KB
-    private static final int VRAM_OFFSET = 0x8000;
-
     private enum Mode {
         OAM_SEARCH, // 2
         PIXEL_TRANSFER, // 3
@@ -18,32 +14,35 @@ public class PPU {
         VBLANK // 1
     }
 
-    private RAM vRam;
+    private VRAM vRam;
     private OAM oam;
     private Screen screen;
     private PPURegisters registers;
     private Palette bgPalette;
 
-    private Mode mode = Mode.OAM_SEARCH;
-    private int modeClock = 0;
-    private int line = 0;
+    private Mode currentMode;
+    private int ticksInLine;
 
     // modes
     private PPUMode oamSearchMode;
     private PPUMode pixelTransferMode;
-    private PPUMode vBlank;
-    private PPUMode hBlank;
+    private PPUMode vBlankMode;
+    private PPUMode hBlankMode;
 
     public PPU() {
-        this.vRam = new RAM(VRAM_CAPACITY, VRAM_OFFSET);
+        this.vRam = new VRAM();
         this.oam = new OAM();
         this.screen = new Screen();
         this.registers = new PPURegisters();
         this.bgPalette = new Palette();
+
         this.oamSearchMode = new OAMSearchMode();
         this.pixelTransferMode = new PixelTransferMode();
-        this.vBlank = new VBlankMode();
-        this.hBlank = new HBlankMode();
+        this.vBlankMode = new VBlankMode();
+        this.hBlankMode = new HBlankMode();
+
+        this.currentMode = Mode.OAM_SEARCH;
+        this.ticksInLine = 0;
 
         // Inicializar os registos essenciais para o LCD funcionar
         registers.setLCDC(0x91); // LCDC ligado, background habilitado
@@ -52,49 +51,33 @@ public class PPU {
         registers.setBGP(0xFC); // Palette padrão para background
     }
 
-    public void step(int cycles) {
-        modeClock += cycles;
+    public void step() {
+        Mode oldMode = currentMode;
+        ticksInLine++;
 
-        switch (mode) {
+        // if(mode.ti) {
+
+        // }
+
+        switch (oldMode) {
             case OAM_SEARCH:
-                if (modeClock >= 80) {
-                    modeClock -= 80;
-                    mode = Mode.PIXEL_TRANSFER;
-                }
+                currentMode = Mode.PIXEL_TRANSFER;
+                pixelTransferMode.start();
                 break;
 
             case PIXEL_TRANSFER:
-                if (modeClock >= 172) {
-                    modeClock -= 172;
-                    mode = Mode.HBLANK;
-                    renderScanline();
-                }
+                currentMode = Mode.HBLANK;
+                hBlankMode.start();
                 break;
 
             case HBLANK:
-                if (modeClock >= 204) {
-                    modeClock -= 204;
-                    line++;
-                    if (line == 144) {
-                        mode = Mode.VBLANK;
-                        // Trigger VBlank interrupt here
-                    } else {
-                        mode = Mode.OAM_SEARCH;
-                    }
-                    registers.setLY(line);
-                }
+                currentMode = Mode.VBLANK;
+                vBlankMode.start();
                 break;
 
             case VBLANK:
-                if (modeClock >= 456) {
-                    modeClock -= 456;
-                    line++;
-                    if (line > 153) {
-                        line = 0;
-                        mode = Mode.OAM_SEARCH;
-                    }
-                    registers.setLY(line);
-                }
+                currentMode = Mode.OAM_SEARCH;
+                oamSearchMode.start();
                 break;
         }
     }

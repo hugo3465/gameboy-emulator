@@ -1,13 +1,25 @@
 package gb_emu.core.ppu;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import gb_emu.core.mem.RAM;
 
 public class OAM extends RAM {
     private static final int OAM_CAPACITY = 0xA0; // 160 bytes
     private static final int OAM_OFFSET = 0xFE00;
+    private static final int SPRITE_LENGHT = 4; //4 bytes
 
     public OAM() {
         super(OAM_CAPACITY, OAM_OFFSET);
+    }
+
+    public List<SpriteObject> getAllSprites() {
+        List<SpriteObject> sprites = new ArrayList<>();
+        for (int i = 0; i < 40; i++) {
+            sprites.add(readSpriteObject(i * SPRITE_LENGHT));
+        }
+        return sprites;
     }
 
     public SpriteObject readSpriteObject(int startAddress) {

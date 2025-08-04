@@ -9,12 +9,10 @@ public class RAM implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(RAM.class);
 
     private int[] mem;
-    private int length;
     private int offset;
 
     public RAM(int length, int offset) {
         this.mem = new int[length];
-        this.length = length;
         this.offset = offset;
     }
 
