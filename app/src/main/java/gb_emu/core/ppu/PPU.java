@@ -1,11 +1,5 @@
 package gb_emu.core.ppu;
 
-import gb_emu.core.ppu.modes.HBlankMode;
-import gb_emu.core.ppu.modes.OAMSearchMode;
-import gb_emu.core.ppu.modes.PPUMode;
-import gb_emu.core.ppu.modes.PixelTransferMode;
-import gb_emu.core.ppu.modes.VBlankMode;
-
 public class PPU {
     private enum Mode {
         OAM_SEARCH, // 2
@@ -21,13 +15,8 @@ public class PPU {
     private Palette bgPalette;
 
     private Mode currentMode;
-    private int ticksInLine;
+    private int modeClock;
 
-    // modes
-    private PPUMode oamSearchMode;
-    private PPUMode pixelTransferMode;
-    private PPUMode vBlankMode;
-    private PPUMode hBlankMode;
 
     public PPU() {
         this.vRam = new VRAM();
@@ -36,13 +25,8 @@ public class PPU {
         this.registers = new PPURegisters();
         this.bgPalette = new Palette();
 
-        this.oamSearchMode = new OAMSearchMode();
-        this.pixelTransferMode = new PixelTransferMode();
-        this.vBlankMode = new VBlankMode();
-        this.hBlankMode = new HBlankMode();
-
         this.currentMode = Mode.OAM_SEARCH;
-        this.ticksInLine = 0;
+        this.modeClock = 0;
 
         // Inicializar os registos essenciais para o LCD funcionar
         registers.setLCDC(0x91); // LCDC ligado, background habilitado
@@ -51,33 +35,45 @@ public class PPU {
         registers.setBGP(0xFC); // Palette padrão para background
     }
 
-    public void step() {
+    public void step(int cycles) {
         Mode oldMode = currentMode;
-        ticksInLine++;
+        modeClock += cycles;
 
-        // if(mode.ti) {
-
-        // }
 
         switch (oldMode) {
             case OAM_SEARCH:
                 currentMode = Mode.PIXEL_TRANSFER;
-                pixelTransferMode.start();
                 break;
 
             case PIXEL_TRANSFER:
                 currentMode = Mode.HBLANK;
-                hBlankMode.start();
                 break;
 
             case HBLANK:
-                currentMode = Mode.VBLANK;
-                vBlankMode.start();
+                // Acho que falta alguma coisa antes
+
+                registers.incrementLY();
+                if (registers.getLY() < 144) {
+                    currentMode = Mode.OAM_SEARCH;
+                } else if (registers.getLY() == 144) {
+                    currentMode = Mode.VBLANK;
+                }
                 break;
 
             case VBLANK:
-                currentMode = Mode.OAM_SEARCH;
-                oamSearchMode.start();
+                if (registers.getLY() == 144) { // first time in this mode
+                    // TODO set IF register to 0 (interupt VBlank)
+                }
+
+                if (modeClock >= 456) {
+                    modeClock = 0;
+                    registers.incrementLY();
+
+                    if (registers.getLY() == 153) {
+                        registers.setLY(0);
+                        currentMode = Mode.OAM_SEARCH;
+                    }
+                }
                 break;
         }
     }

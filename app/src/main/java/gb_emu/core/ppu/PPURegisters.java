@@ -45,6 +45,9 @@ public class PPURegisters {
     public void setLY(int lY) {
         LY = lY;
     }
+    public void incrementLY() {
+        LY++;
+    }
     public int getLYC() {
         return LYC;
     }

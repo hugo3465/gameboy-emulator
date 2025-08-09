@@ -1,8 +1,6 @@
 package gb_emu.core.cpu.instructions;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import gb_emu.core.Instruction;
 import gb_emu.core.cpu.CPU;
