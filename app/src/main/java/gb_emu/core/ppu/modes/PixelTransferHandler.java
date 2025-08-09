@@ -7,7 +7,7 @@ public class PixelTransferHandler implements PPUMode {
     }
 
     @Override
-    public boolean tick() {
+    public void tick() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'tick'");
     }

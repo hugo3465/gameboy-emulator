@@ -1,5 +1,7 @@
 package gb_emu.core.ppu;
 
+import gb_emu.core.ppu.modes.OAMSearchHandler;
+
 public class PPU {
     private enum Mode {
         OAM_SEARCH, // 2
@@ -17,6 +19,8 @@ public class PPU {
     private Mode currentMode;
     private int modeClock;
 
+    private OAMSearchHandler oamSearchHandler;
+
 
     public PPU() {
         this.vRam = new VRAM();
@@ -27,6 +31,8 @@ public class PPU {
 
         this.currentMode = Mode.OAM_SEARCH;
         this.modeClock = 0;
+
+        this.oamSearchHandler = new OAMSearchHandler(oam, registers);
 
         // Inicializar os registos essenciais para o LCD funcionar
         registers.setLCDC(0x91); // LCDC ligado, background habilitado
@@ -43,9 +49,11 @@ public class PPU {
         switch (oldMode) {
             case OAM_SEARCH:
                 currentMode = Mode.PIXEL_TRANSFER;
+                oamSearchHandler.tick();
                 break;
 
             case PIXEL_TRANSFER:
+                renderScanline();
                 currentMode = Mode.HBLANK;
                 break;
 
