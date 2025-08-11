@@ -24,7 +24,6 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
 
     private void ld_r_n(Consumer<Integer> setter, int value) {
         setter.accept(value);
-        registers.incrementPC();
     }
 
     private void ld_r_r(Consumer<Integer> setter, Supplier<Integer> getter) {
@@ -257,7 +256,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0xEA, wrap(() -> { // LD (a16), A
             int address = readImmediate16();
             mmu.write(address, registers.getA());
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 16));
 
         functions.put(0xF0, wrap(() -> { // LDH A, (a8)
@@ -278,13 +277,13 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int address = readImmediate16();
             int value = mmu.read(address);
             registers.setA(value);
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 16));
 
         functions.put(0x01, wrap(() -> { // LD BC, d16
             int value = readImmediate16();
             registers.setBC(value);
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0x08, wrap(() -> { // LD (a16), SP
@@ -292,25 +291,25 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int sp = registers.getSP();
             mmu.write(address, sp & 0xFF); // low byte
             mmu.write((address + 1) & 0xFFFF, sp >> 8); // high byte
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 20));
 
         functions.put(0x11, wrap(() -> { // LD DE, d16
             int value = readImmediate16();
             registers.setDE(value);
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0x21, wrap(() -> { // LD HL, d16
             int value = readImmediate16();
             registers.setHL(value);
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0x31, wrap(() -> { // LD SP, d16
             int value = readImmediate16();
             registers.setSP(value);
-            registers.incrementPC(3);
+            registers.incrementPC();
         }, 12));
 
         functions.put(0xF8, wrap(() -> { // LD HL, SP+r8 (signed offset)
