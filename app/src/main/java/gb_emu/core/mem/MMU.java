@@ -1,6 +1,5 @@
 package gb_emu.core.mem;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +51,12 @@ public class MMU {
             return wram.read(address - ECHO_RAM_TO_WRAM_SHIFT); // Echo RAM
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             return ppu.readOAM(address);
+        } else if (address >= 0xFF40 && address <= 0xFF4B) {
+            // Delegar a leitura dos registos PPU para PPURegisters
+            return ppu.getRegisters().readRegister(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
-            // return registers.read(address);
-            return 0xFF; // TODO implement it later
+            LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X", address));
+            return 0xFF; // TODO implementar futuramente
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             return hram.read(address);
         } else if (address == 0xFFFF) {
@@ -66,7 +68,7 @@ public class MMU {
     }
 
     public void write(int address, int value) {
-        value &= 0xFF; // guarantees 8-bit value
+        value &= 0xFF; // garante valor 8 bits
 
         if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
@@ -77,11 +79,14 @@ public class MMU {
         } else if (address >= 0xC000 && address <= 0xDFFF) {
             wram.write(address, value);
         } else if (address >= 0xE000 && address <= 0xFDFF) {
-            wram.write((address - ECHO_RAM_TO_WRAM_SHIFT), value);
+            wram.write(address - ECHO_RAM_TO_WRAM_SHIFT, value);
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             ppu.writeOAM(address, value);
+        } else if (address >= 0xFF40 && address <= 0xFF4B) {
+            // Delegar escrita para PPURegisters
+            ppu.getRegisters().writeRegister(address, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
-            // registers.write(address, value);
+            // registers.write(address, value); // ainda não implementado
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             hram.write(address, value);
         } else if (address == 0xFFFF) {
