@@ -54,5 +54,10 @@ public class MiscInstructions extends AbstractInstruction implements Instruction
             // undocumented, so is treated as a NOP
             registers.incrementPC();
         }, 4));
+
+        functions.put(0xED, wrap(() -> {
+            // undocumented, so is treated as a NOP
+            registers.incrementPC();
+        }, 4));
     }
 }
