@@ -43,9 +43,11 @@ public class Screen extends JPanel {
         // }
 
         // Atualiza a imagem
-        while (true) {
-            int[] screen = gb.getScreen();
-            this.updatePixels(screen);
-        }
+        new Thread(() -> {
+            while (true) {
+                int[] screen = gb.getScreen();
+                this.updatePixels(screen);
+            }
+        }).start();
     }
 }

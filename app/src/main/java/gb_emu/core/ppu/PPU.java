@@ -91,6 +91,18 @@ public class PPU {
         return screen.getPixels();
     }
 
+    public VRAM getVram() {
+        return vRam;
+    }
+
+    public OAM getOAM() {
+        return oam;
+    }
+
+    public OAM getOam() {
+        return oam;
+    }
+
     public int readVRAM(int address) {
         return vRam.read(address);
     }
@@ -106,7 +118,7 @@ public class PPU {
     public void writeOAM(int address, int value) {
         oam.write(address, value);
     }
-    
+
     public PPURegisters getRegisters() {
         return registers;
     }
