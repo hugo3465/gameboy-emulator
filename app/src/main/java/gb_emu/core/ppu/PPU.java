@@ -2,6 +2,7 @@ package gb_emu.core.ppu;
 
 import gb_emu.core.ppu.modes.OAMSearchHandler;
 import gb_emu.core.ppu.modes.PixelTransferHandler;
+import gb_emu.core.mem.MMU;
 
 public class PPU {
     private enum Mode {
@@ -11,6 +12,7 @@ public class PPU {
         VBLANK // 1
     }
 
+    private MMU mmu;
     private VRAM vRam;
     private OAM oam;
     private Screen screen;
@@ -23,11 +25,12 @@ public class PPU {
     private OAMSearchHandler oamSearchHandler;
     private PixelTransferHandler pixelTransferHandler;
 
-    public PPU() {
-        this.vRam = new VRAM();
-        this.oam = new OAM();
+    public PPU(PPURegisters ppuRegisters, VRAM vram, OAM oam, MMU mmu) {
+        this.vRam = vram;
+        this.registers = ppuRegisters;
+        this.oam = oam;
+        this.mmu = mmu;
         this.screen = new Screen();
-        this.registers = new PPURegisters();
         this.bgPalette = new Palette();
 
         this.currentMode = Mode.OAM_SEARCH;
@@ -70,8 +73,9 @@ public class PPU {
                 break;
 
             case VBLANK:
-                if (registers.getLY() == 144) { // first time in this mode
-                    // TODO set IF register to 0 (interupt VBlank)
+                if (registers.getLY() == 144) {
+                    // set IF register to 0 (interupt VBlank)
+                    mmu.write(0xFF0F, 0);
                 }
 
                 if (modeClock >= 456) {
@@ -101,22 +105,6 @@ public class PPU {
 
     public OAM getOam() {
         return oam;
-    }
-
-    public int readVRAM(int address) {
-        return vRam.read(address);
-    }
-
-    public void writeVRAM(int address, int value) {
-        vRam.write(address, value);
-    }
-
-    public int readOAM(int address) {
-        return oam.read(address);
-    }
-
-    public void writeOAM(int address, int value) {
-        oam.write(address, value);
     }
 
     public PPURegisters getRegisters() {

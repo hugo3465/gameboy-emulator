@@ -5,7 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.cartridge.Cartridge;
-import gb_emu.core.ppu.PPU;
+import gb_emu.core.ppu.VRAM;
+import gb_emu.core.ppu.PPURegisters;
+import gb_emu.core.ppu.OAM;
+
 
 /**
  * MMU serves as a mediator between the CPU and the memmory.
@@ -22,8 +25,10 @@ public class MMU {
     private static final int ECHO_RAM_TO_WRAM_SHIFT = 0x2000;
 
     private Cartridge cartridge;
-    private PPU ppu;
     private CPURegisters cpuRegisters;
+    private PPURegisters ppuRegisters;
+    private OAM oam;
+    private VRAM vram;
     private RAM wram; // Work RAM
     private RAM hram; // High RAM
 
@@ -31,10 +36,12 @@ public class MMU {
     // private Registers registers; // acho que não coloquei os registers certos,
     // não são de IO estes
 
-    public MMU(Cartridge cartridge, PPU ppu, CPURegisters cpuRegisters) {
+    public MMU(Cartridge cartridge, CPURegisters cpuRegisters, PPURegisters ppuRegisters, VRAM vram, OAM oam) {
         this.cartridge = cartridge;
-        this.ppu = ppu;
         this.cpuRegisters = cpuRegisters;
+        this.ppuRegisters = ppuRegisters;
+        this.vram = vram;
+        this.oam = oam;
 
         this.wram = new RAM(WORK_RAM_LENGHT, WORK_RAM_OFFSET);
         this.hram = new RAM(HIGH_RAM_LENGHT, HIGH_RAM_OFFSET);
@@ -48,7 +55,7 @@ public class MMU {
         } else if (address >= 0x0000 && address <= 0x7FFF) {
             return cartridge.read(address);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
-            return ppu.readVRAM(address);
+            return vram.read(address);
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             return cartridge.read(address); // external RAM
         } else if (address >= 0xC000 && address <= 0xDFFF) {
@@ -56,9 +63,9 @@ public class MMU {
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             return wram.read(address - ECHO_RAM_TO_WRAM_SHIFT); // Echo RAM
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            return ppu.readOAM(address);
+            return oam.read(address);
         } else if (address >= 0xFF40 && address <= 0xFF4B) {
-            return ppu.getRegisters().readRegister(address);
+            return ppuRegisters.readRegister(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X",
             // address));
@@ -81,7 +88,7 @@ public class MMU {
         } else if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
-            ppu.writeVRAM(address, value);
+            vram.write(address, value);
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             cartridge.write(address, value);
         } else if (address >= 0xC000 && address <= 0xDFFF) {
@@ -89,9 +96,9 @@ public class MMU {
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             wram.write(address - ECHO_RAM_TO_WRAM_SHIFT, value);
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            ppu.writeOAM(address, value);
+            oam.write(address, value);
         } else if (address >= 0xFF40 && address <= 0xFF4B) {
-            ppu.getRegisters().writeRegister(address, value);
+            ppuRegisters.writeRegister(address, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // registers.write(address, value); // ainda não implementado
         } else if (address >= 0xFF80 && address <= 0xFFFE) {

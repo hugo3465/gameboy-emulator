@@ -6,26 +6,32 @@ import org.slf4j.LoggerFactory;
 import gb_emu.core.cpu.CPU;
 import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.MMU;
-import gb_emu.core.mem.RAM;
 import gb_emu.core.mem.cartridge.Cartridge;
 import gb_emu.core.ppu.PPU;
+import gb_emu.core.ppu.VRAM;
+import gb_emu.core.ppu.PPURegisters;
+import gb_emu.core.ppu.OAM;
+
 
 public class GameBoy {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameBoy.class);
 
     private CPU cpu;
     private Cartridge cartridge;
-    private RAM ram;
     private MMU mmu;
     private PPU ppu;
 
     public GameBoy(Cartridge cartridge) {
         this.cartridge = cartridge;
         
-        CPURegisters registers = new CPURegisters();
-        this.ppu = new PPU();
-        this.mmu = new MMU(cartridge, ppu, registers);
-        this.cpu = new CPU(mmu, registers);
+        CPURegisters cpuRegisters = new CPURegisters();
+        PPURegisters ppuRegisters = new PPURegisters();
+        OAM oam = new OAM();
+        VRAM vram = new VRAM();
+
+        this.mmu = new MMU(cartridge, cpuRegisters, ppuRegisters, vram, oam);
+        this.ppu = new PPU(ppuRegisters, vram, oam, mmu);
+        this.cpu = new CPU(mmu, cpuRegisters);
     }
 
     public void start() {
@@ -34,7 +40,7 @@ public class GameBoy {
             ppu.step(cycles);
 
             // try {
-            //     Thread.sleep(500);
+            //     Thread.sleep(100);
             // } catch (InterruptedException e) {
             //     // TODO Auto-generated catch block
             //     e.printStackTrace();
@@ -54,10 +60,6 @@ public class GameBoy {
 
     public Cartridge getCartridge() {
         return cartridge;
-    }
-
-    public RAM getRam() {
-        return ram;
     }
 
     public int[] getScreen() {
