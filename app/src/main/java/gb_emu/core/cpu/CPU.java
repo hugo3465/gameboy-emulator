@@ -55,10 +55,11 @@ public class CPU implements Serializable {
             opcode = mmu.read(registers.getPC());
             registers.incrementPC();
             isPrefixCbInstruction = true;
-            // LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
+            LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", opcode));
+        } else {
+            LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         }
 
-        LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         LOGGER.debug("PC: " + String.format("0x%04X", registers.getPC()));
 
         return instructionsMap.execute(opcode, isPrefixCbInstruction);
@@ -71,11 +72,13 @@ public class CPU implements Serializable {
      */
     private boolean shouldWakeUp() {
         // Check for pending interrupts
-         int interruptEnable = registers.getInterruptEnable(); // IE register
+        int interruptEnable = registers.getInterruptEnable(); // IE register
         int interruptFlags = registers.getInterruptFlags(); // IF register
 
-        // LOGGER.debug("Interrupt Enable (IE): 0x" + String.format("%02X", interruptEnable));
-        // LOGGER.debug("Interrupt Flags (IF): 0x" + String.format("%02X", interruptFlags));
+        // LOGGER.debug("Interrupt Enable (IE): 0x" + String.format("%02X",
+        // interruptEnable));
+        // LOGGER.debug("Interrupt Flags (IF): 0x" + String.format("%02X",
+        // interruptFlags));
 
         // If any enabled interrupt is pending, wake up
         boolean hasInterrupt = (interruptEnable & interruptFlags) != 0;

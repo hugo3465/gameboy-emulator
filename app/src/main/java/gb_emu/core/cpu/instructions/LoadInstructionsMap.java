@@ -128,6 +128,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x5F, wrap(() -> ld_r_r(registers::setE, registers::getA), 4)); // LD E, A
 
         // LD H, r
+
         functions.put(0x26, wrap(() -> ld_r_n(registers::setH, readImmediate8()), 8)); // LD H, d8
 
         functions.put(0x60, wrap(() -> ld_r_r(registers::setH, registers::getB), 4)); // LD H, B
@@ -147,6 +148,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x67, wrap(() -> ld_r_r(registers::setH, registers::getA), 4)); // LD H, A
 
         // LD L, r
+
         functions.put(0x2E, wrap(() -> ld_r_n(registers::setL, readImmediate8()), 8)); // LD L, d8
 
         functions.put(0x68, wrap(() -> ld_r_r(registers::setL, registers::getB), 4)); // LD L, B
@@ -168,7 +170,6 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         // LD (HL), r
         functions.put(0x36, wrap(() -> {
             mmu.write(registers.getHL(), readImmediate8());
-            registers.incrementPC();
         }, 12)); // LD (HL), d8
 
         functions.put(0x70, wrap(() -> ld_pair_r(registers::getHL, registers::getB), 8)); // LD (HL), B
@@ -186,6 +187,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x77, wrap(() -> ld_pair_r(registers::getHL, registers::getA), 8)); // LD (HL), A
 
         // LD A, r
+
         functions.put(0x1A, wrap(() -> ld_r_pair(registers::setA, registers::getDE), 8)); // LD A, (DE)
 
         functions.put(0x3E, wrap(() -> ld_r_n(registers::setA, readImmediate8()), 8)); // LD A, d8
@@ -207,44 +209,42 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x7F, wrap(() -> ld_r_r(registers::setA, registers::getA), 4)); // LD A, A
 
         // LD (BC), r
+
         functions.put(0x02, wrap(() -> ld_pair_r(registers::getBC, registers::getA), 8)); // LD (BC), A
 
         // LD (DE), r
+
         functions.put(0x12, wrap(() -> ld_pair_r(registers::getDE, registers::getA), 8)); // LD (DE), A
 
         // ===== Special LD instructions =====
+        
         functions.put(0x22, wrap(() -> { // LD (HL+), A
             int address = registers.getHL();
             mmu.write(address, registers.getA());
             registers.setHL((address + 1) & 0xFFFF);
-            registers.incrementPC();
         }, 8));
 
         functions.put(0x2A, wrap(() -> { // LD A, (HL+)
             int value = mmu.read(registers.getHL());
             registers.setA(value);
             registers.setHL((registers.getHL() + 1) & 0xFFFF);
-            registers.incrementPC();
         }, 8));
 
         functions.put(0x32, wrap(() -> { // LD (HL-), A
             int address = registers.getHL();
             mmu.write(address, registers.getA());
             registers.setHL((address - 1) & 0xFFFF);
-            registers.incrementPC();
         }, 8));
 
         functions.put(0x3A, wrap(() -> { // LD A, (HL-)
             int value = mmu.read(registers.getHL());
             registers.setA(value);
             registers.setHL((registers.getHL() - 1) & 0xFFFF);
-            registers.incrementPC();
         }, 8));
 
         functions.put(0xE0, wrap(() -> { // LDH (a8), A
             int address = 0xFF00 + readImmediate8();
             mmu.write(address, registers.getA());
-            registers.incrementPC();
         }, 12));
 
         functions.put(0xE2, wrap(() -> { // LD (C), A
@@ -256,14 +256,12 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0xEA, wrap(() -> { // LD (a16), A
             int address = readImmediate16();
             mmu.write(address, registers.getA());
-            registers.incrementPC();
         }, 16));
 
         functions.put(0xF0, wrap(() -> { // LDH A, (a8)
             int address = 0xFF00 + readImmediate8();
             int value = mmu.read(address);
             registers.setA(value);
-            registers.incrementPC();
         }, 12));
 
         functions.put(0xF2, wrap(() -> { // LD A, (C)
@@ -277,13 +275,11 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int address = readImmediate16();
             int value = mmu.read(address);
             registers.setA(value);
-            registers.incrementPC();
         }, 16));
 
         functions.put(0x01, wrap(() -> { // LD BC, d16
             int value = readImmediate16();
             registers.setBC(value);
-            registers.incrementPC();
         }, 12));
 
         functions.put(0x08, wrap(() -> { // LD (a16), SP
@@ -291,25 +287,21 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int sp = registers.getSP();
             mmu.write(address, sp & 0xFF); // low byte
             mmu.write((address + 1) & 0xFFFF, sp >> 8); // high byte
-            registers.incrementPC();
         }, 20));
 
         functions.put(0x11, wrap(() -> { // LD DE, d16
             int value = readImmediate16();
             registers.setDE(value);
-            registers.incrementPC();
         }, 12));
 
         functions.put(0x21, wrap(() -> { // LD HL, d16
             int value = readImmediate16();
             registers.setHL(value);
-            registers.incrementPC();
         }, 12));
 
         functions.put(0x31, wrap(() -> { // LD SP, d16
             int value = readImmediate16();
             registers.setSP(value);
-            registers.incrementPC();
         }, 12));
 
         functions.put(0xF8, wrap(() -> { // LD HL, SP+r8 (signed offset)
@@ -323,13 +315,10 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             registers.setFlagN(false);
             registers.setFlagH(((sp ^ offset ^ result) & 0x10) != 0);
             registers.setFlagC(((sp ^ offset ^ result) & 0x100) != 0);
-
-            registers.incrementPC();
         }, 12));
 
         functions.put(0xF9, wrap(() -> { // LD SP, HL
             registers.setSP(registers.getHL());
-            registers.incrementPC();
         }, 8));
 
         /**

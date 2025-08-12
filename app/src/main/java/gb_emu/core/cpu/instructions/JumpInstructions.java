@@ -185,37 +185,41 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             ret();
         }, 16));
 
-        functions.put(0xC0, wrap(() -> { // RET NZ
+        functions.put(0xC0, () -> { // RET NZ
             if (!registers.getFlagZ()) {
                 ret();
+                return 20;
             } else {
-                registers.incrementPC();
+                return 8;
             }
-        }, 8)); // 20 cycles if taken, 8 if not. Handled dynamically if needed
+        }); // 20 cycles if taken, 8 if not. Handled dynamically if needed
 
-        functions.put(0xC8, wrap(() -> { // RET Z
+        functions.put(0xC8, () -> { // RET Z
             if (registers.getFlagZ()) {
                 ret();
+                return 20;
             } else {
-                registers.incrementPC();
+                return 8;
             }
-        }, 8));
+        });
 
-        functions.put(0xD0, wrap(() -> { // RET NC
+        functions.put(0xD0, () -> { // RET NC
             if (!registers.getFlagC()) {
                 ret();
+                return 20;
             } else {
-                registers.incrementPC();
+                return 8;
             }
-        }, 8));
+        });
 
-        functions.put(0xD8, wrap(() -> { // RET C
+        functions.put(0xD8, () -> { // RET C
             if (registers.getFlagC()) {
                 ret();
+                return 20;
             } else {
-                registers.incrementPC();
+                return 8;
             }
-        }, 8));
+        });
 
         /**
          * RETI

@@ -24,8 +24,6 @@ public class BitInstructions extends AbstractInstruction implements InstructionS
             registers.setFlagN(false);
             registers.setFlagH(false);
             registers.setFlagC(carry);
-
-            registers.incrementPC();
         }, 4));
 
         functions.put(0x07, wrap(() -> { // RLCA
@@ -38,8 +36,6 @@ public class BitInstructions extends AbstractInstruction implements InstructionS
             registers.setFlagN(false);
             registers.setFlagH(false);
             registers.setFlagC(carry);
-
-            registers.incrementPC();
         }, 4));
     }
 }

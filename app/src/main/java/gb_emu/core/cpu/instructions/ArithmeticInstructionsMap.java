@@ -29,7 +29,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(result > 0xFF);
 
         registers.setA(result & 0xFF);
-        registers.incrementPC();
     }
 
     /**
@@ -49,7 +48,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(result > 0xFF);
 
         registers.setA(result & 0xFF);
-        registers.incrementPC();
     }
 
     /**
@@ -67,6 +65,7 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(result > 0xFFFF);
 
         registers.setHL(result & 0xFFFF);
+        
         registers.incrementPC();
     }
 
@@ -86,7 +85,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC((sp & 0xFF) + (offset & 0xFF) > 0xFF);
 
         registers.setSP(result & 0xFFFF);
-        registers.incrementPC();
     }
 
     /**
@@ -105,7 +103,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(a < value);
 
         registers.setA(result & 0xFF);
-        registers.incrementPC();
     }
 
     /**
@@ -125,7 +122,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC((a & 0xFF) < (value + carry));
 
         registers.setA(result & 0xFF);
-        registers.incrementPC();
     }
 
     /**
@@ -164,8 +160,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagN(false);
         registers.setFlagH(true);
         registers.setFlagC(false);
-
-        registers.incrementPC();
     }
 
     private void or(int value) {
@@ -176,8 +170,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagN(false);
         registers.setFlagH(false);
         registers.setFlagC(false);
-
-        registers.incrementPC();
     }
 
     @Override
