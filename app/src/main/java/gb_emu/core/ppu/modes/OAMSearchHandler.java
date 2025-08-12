@@ -36,7 +36,7 @@ public class OAMSearchHandler implements PPUMode {
 
         // For debug porpuses
         // Don't know why is being hollow
-        System.out.println(visibleSprites.toString());
+        // System.out.println(visibleSprites.toString());
     }
 
     @Override

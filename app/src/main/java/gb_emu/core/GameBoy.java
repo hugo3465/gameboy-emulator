@@ -24,7 +24,7 @@ public class GameBoy {
         
         CPURegisters registers = new CPURegisters();
         this.ppu = new PPU();
-        this.mmu = new MMU(cartridge, ppu);
+        this.mmu = new MMU(cartridge, ppu, registers);
         this.cpu = new CPU(mmu, registers);
     }
 
@@ -34,17 +34,22 @@ public class GameBoy {
             ppu.step(cycles);
 
             // try {
-            //     Thread.sleep(100);
+            //     Thread.sleep(500);
             // } catch (InterruptedException e) {
             //     // TODO Auto-generated catch block
             //     e.printStackTrace();
             // }
+
             // future: timers.step(), input.step()
         }
     }
 
     public CPU getCpu() {
         return cpu;
+    }
+
+    public PPU getPPU() {
+        return ppu;
     }
 
     public Cartridge getCartridge() {

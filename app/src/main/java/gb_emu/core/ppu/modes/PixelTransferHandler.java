@@ -35,7 +35,7 @@ public class PixelTransferHandler implements PPUMode {
             int bgX = (scx + x) & 0xFF; // X coordenate on the BG map
             int bgY = (scy + ly) & 0xFF;
 
-            // find tile
+            // Find tile
             int tileCol = bgX / TILE_SIZE;
             int tileRow = bgY / TILE_SIZE;
             int tileMapIndex = tileRow * NUMBER_OF_TILES + tileCol;
@@ -52,14 +52,14 @@ public class PixelTransferHandler implements PPUMode {
             }
             int tileDataBase = registers.getBgWindowTileData();
 
-            // read the tile line that contains the pixel
+            // Read the tile line that contains the pixel
             int lineInTile = bgY % TILE_SIZE;
             int tileAddr = tileDataBase + (tileIndex * 16) + (lineInTile * 2);
 
             int lowByte = vRam.read(tileAddr);
             int highByte = vRam.read(tileAddr + 1);
 
-            // extract right pixel
+            // Extract right pixel
             int bitIndex = 7 - (bgX % TILE_SIZE);
             int bit0 = (lowByte >> bitIndex) & 1;
             int bit1 = (highByte >> bitIndex) & 1;
@@ -68,7 +68,7 @@ public class PixelTransferHandler implements PPUMode {
             // Apply pallet
             int color = bgPalette.getColor(colorId);
 
-            // escrever no framebuffer
+            // Escrever no framebuffer
             int index = ly * Screen.SCREEN_WIDTH + x;
             screen.writeOnScreen(index, color);
         }

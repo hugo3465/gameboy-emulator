@@ -3,6 +3,7 @@ package gb_emu.core.mem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.cartridge.Cartridge;
 import gb_emu.core.ppu.PPU;
 
@@ -22,17 +23,18 @@ public class MMU {
 
     private Cartridge cartridge;
     private PPU ppu;
+    private CPURegisters cpuRegisters;
     private RAM wram; // Work RAM
     private RAM hram; // High RAM
-    private byte interruptEnable = 0;
 
     // Not implemented
     // private Registers registers; // acho que não coloquei os registers certos,
     // não são de IO estes
 
-    public MMU(Cartridge cartridge, PPU ppu) {
+    public MMU(Cartridge cartridge, PPU ppu, CPURegisters cpuRegisters) {
         this.cartridge = cartridge;
         this.ppu = ppu;
+        this.cpuRegisters = cpuRegisters;
 
         this.wram = new RAM(WORK_RAM_LENGHT, WORK_RAM_OFFSET);
         this.hram = new RAM(HIGH_RAM_LENGHT, HIGH_RAM_OFFSET);
@@ -55,12 +57,15 @@ public class MMU {
             // Delegar a leitura dos registos PPU para PPURegisters
             return ppu.getRegisters().readRegister(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
-            LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X", address));
+            // LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X",
+            // address));
             return 0xFF; // TODO implementar futuramente
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             return hram.read(address);
-        } else if (address == 0xFFFF) {
-            return Byte.toUnsignedInt(interruptEnable);
+        } else if (address == 0xFF0F) { // IF register
+            return cpuRegisters.getInterruptFlags();
+        } else if (address == 0xFFFF) { // IE register
+            return cpuRegisters.getInterruptEnable();
         } else {
             LOGGER.warn(String.format("Attempted to read out-of-bounds address: 0x%04X", address));
             return 0xFF;
@@ -89,8 +94,10 @@ public class MMU {
             // registers.write(address, value); // ainda não implementado
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             hram.write(address, value);
-        } else if (address == 0xFFFF) {
-            interruptEnable = (byte) value;
+        } else if (address == 0xFF0F) { // IF register
+            cpuRegisters.setInterruptFlags(value);
+        } else if (address == 0xFFFF) { // IE register
+            cpuRegisters.setInterruptEnable(value);
         }
     }
 }

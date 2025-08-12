@@ -22,7 +22,7 @@ class InstructionsMapTest {
                 "/home/hugo-guimar-es/roms/GB/bootix_dmg.bin");
         registers = new CPURegisters();
         PPU ppu = new PPU();
-        mmu = new MMU(cartridge, ppu);
+        mmu = new MMU(cartridge, ppu, registers);
 
         cpu = new CPU(mmu, registers);
     }

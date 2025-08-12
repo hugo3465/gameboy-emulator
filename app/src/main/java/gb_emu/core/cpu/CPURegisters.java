@@ -29,6 +29,9 @@ public class CPURegisters {
     private boolean hf; // half carry flag
     private boolean halt;
 
+    private int interruptEnable = 0; // IE register
+    private int interruptFlags = 0; // IF register
+
     public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
         this.pc = PROGRAM_COUNTER_INITIAL_ADDRESS;
@@ -321,5 +324,21 @@ public class CPURegisters {
 
     public void setFlagH(boolean value) {
         hf = value;
+    }
+
+    public int getInterruptEnable() {
+        return interruptEnable & 0xFF;
+    }
+
+    public void setInterruptEnable(int value) {
+        interruptEnable = value & 0xFF;
+    }
+
+    public int getInterruptFlags() {
+        return interruptFlags & 0xFF;
+    }
+
+    public void setInterruptFlags(int value) {
+        interruptFlags = value & 0xFF;
     }
 }
