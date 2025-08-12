@@ -1,6 +1,5 @@
 package gb_emu.ui.debugScreen;
 
-import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.ppu.PPURegisters;
 
 import javax.swing.*;

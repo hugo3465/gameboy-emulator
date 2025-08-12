@@ -17,11 +17,13 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         int pc = registers.getPC() + 1;
         int sp = registers.getSP();
 
+        // Push the current PC onto the stack (high byte first, then low byte)
         sp = (sp - 1) & 0xFFFF;
-        mmu.write(sp, (pc >> 8) & 0xFF);
+        mmu.write(sp, (pc >> 8) & 0xFF); // high byte
         sp = (sp - 1) & 0xFFFF;
-        mmu.write(sp, pc & 0xFF);
+        mmu.write(sp, pc & 0xFF); // low byte
 
+        // Update the stack pointer and jump to the new address
         registers.setSP(sp);
         registers.setPC(address);
     }

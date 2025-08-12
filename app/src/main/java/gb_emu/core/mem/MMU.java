@@ -41,7 +41,11 @@ public class MMU {
     }
 
     public int read(int address) {
-        if (address >= 0x0000 && address <= 0x7FFF) {
+        if (address == 0xFF0F) { // IF register
+            return cpuRegisters.getInterruptFlags();
+        } else if (address == 0xFFFF) { // IE register
+            return cpuRegisters.getInterruptEnable();
+        } else if (address >= 0x0000 && address <= 0x7FFF) {
             return cartridge.read(address);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
             return ppu.readVRAM(address);
@@ -54,7 +58,6 @@ public class MMU {
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             return ppu.readOAM(address);
         } else if (address >= 0xFF40 && address <= 0xFF4B) {
-            // Delegar a leitura dos registos PPU para PPURegisters
             return ppu.getRegisters().readRegister(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X",
@@ -62,10 +65,6 @@ public class MMU {
             return 0xFF; // TODO implementar futuramente
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             return hram.read(address);
-        } else if (address == 0xFF0F) { // IF register
-            return cpuRegisters.getInterruptFlags();
-        } else if (address == 0xFFFF) { // IE register
-            return cpuRegisters.getInterruptEnable();
         } else {
             LOGGER.warn(String.format("Attempted to read out-of-bounds address: 0x%04X", address));
             return 0xFF;
@@ -75,7 +74,11 @@ public class MMU {
     public void write(int address, int value) {
         value &= 0xFF; // garante valor 8 bits
 
-        if (address >= 0x0000 && address <= 0x7FFF) {
+        if (address == 0xFF0F) { // IF register
+            cpuRegisters.setInterruptFlags(value);
+        } else if (address == 0xFFFF) { // IE register
+            cpuRegisters.setInterruptEnable(value);
+        } else if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
             ppu.writeVRAM(address, value);
@@ -88,16 +91,11 @@ public class MMU {
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
             ppu.writeOAM(address, value);
         } else if (address >= 0xFF40 && address <= 0xFF4B) {
-            // Delegar escrita para PPURegisters
             ppu.getRegisters().writeRegister(address, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
             // registers.write(address, value); // ainda não implementado
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             hram.write(address, value);
-        } else if (address == 0xFF0F) { // IF register
-            cpuRegisters.setInterruptFlags(value);
-        } else if (address == 0xFFFF) { // IE register
-            cpuRegisters.setInterruptEnable(value);
         }
     }
 }
