@@ -7,9 +7,11 @@ public class PPURegisters {
     private int SCX = 0x00; // (0xFF43) Scroll X
     private int LY = 0x00; // (0xFF44) Current line
     private int LYC = 0x00; // (0xFF45) Line compare
+    private int BGP = 0xFC; // (0xFF47) Background palette
+    private int OBP0 = 0xFF; // (0xFF48) Sprite 0 pallete
+    private int OBP1 = 0xFF; // (0xFF49) Sprite 1 pallete
     private int WY = 0x00; // (0xFF4A) Window Y
     private int WX = 0x00; // (0xFF4B) Window X
-    private int BGP = 0xFC; // (0xFF47) Background palette
 
     public PPURegisters() {
     }
@@ -90,6 +92,22 @@ public class PPURegisters {
         BGP = bGP;
     }
 
+    public int getOBP0() {
+        return OBP0;
+    }
+
+    public void setOBP0(int value) {
+        OBP0 = value;
+    }
+
+    public int getOBP1() {
+        return OBP1;
+    }
+
+    public void setOBP1(int value) {
+        OBP1 = value;
+    }
+
     /**
      * LCDC Utils
      * from coffee-gb
@@ -133,15 +151,24 @@ public class PPURegisters {
 
     public int readRegister(int address) {
         switch (address) {
-            case 0xFF40: return getLCDC();
-            case 0xFF41: return getSTAT();
-            case 0xFF42: return getSCY();
-            case 0xFF43: return getSCX();
-            case 0xFF44: return getLY();
-            case 0xFF45: return getLYC();
-            case 0xFF47: return getBGP();
-            case 0xFF4A: return getWY();
-            case 0xFF4B: return getWX();
+            case 0xFF40:
+                return getLCDC();
+            case 0xFF41:
+                return getSTAT();
+            case 0xFF42:
+                return getSCY();
+            case 0xFF43:
+                return getSCX();
+            case 0xFF44:
+                return getLY();
+            case 0xFF45:
+                return getLYC();
+            case 0xFF47:
+                return getBGP();
+            case 0xFF4A:
+                return getWY();
+            case 0xFF4B:
+                return getWX();
             default:
                 return 0xFF;
         }
@@ -149,17 +176,33 @@ public class PPURegisters {
 
     public void writeRegister(int address, int value) {
         switch (address) {
-            case 0xFF40: setLCDC(value); break;
-            case 0xFF41: setSTAT(value); break;
-            case 0xFF42: setSCY(value); break;
-            case 0xFF43: setSCX(value); break;
-            case 0xFF44: 
+            case 0xFF40:
+                setLCDC(value);
+                break;
+            case 0xFF41:
+                setSTAT(value);
+                break;
+            case 0xFF42:
+                setSCY(value);
+                break;
+            case 0xFF43:
+                setSCX(value);
+                break;
+            case 0xFF44:
                 // LY just for reading
                 break;
-            case 0xFF45: setLYC(value); break;
-            case 0xFF47: setBGP(value); break;
-            case 0xFF4A: setWY(value); break;
-            case 0xFF4B: setWX(value); break;
+            case 0xFF45:
+                setLYC(value);
+                break;
+            case 0xFF47:
+                setBGP(value);
+                break;
+            case 0xFF4A:
+                setWY(value);
+                break;
+            case 0xFF4B:
+                setWX(value);
+                break;
             default:
                 break;
         }
