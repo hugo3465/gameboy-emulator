@@ -109,7 +109,7 @@ public class PPU {
                     modeClock -= LINE_CYCLES;
                     registers.incrementLY();
 
-                    if (registers.getLY() > VBLANK_LINES_END) { // resets the square
+                    if (registers.getLY() > VBLANK_LINES_END) { // resets the frame
                         registers.setLY(0);
                         currentMode = Mode.OAM_SEARCH;
                         frameReady = false;

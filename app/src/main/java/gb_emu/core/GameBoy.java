@@ -12,9 +12,10 @@ import gb_emu.core.ppu.VRAM;
 import gb_emu.core.ppu.PPURegisters;
 import gb_emu.core.ppu.OAM;
 
-
 public class GameBoy {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameBoy.class);
+
+    private FrameObserver observer;
 
     private CPU cpu;
     private Cartridge cartridge;
@@ -23,7 +24,7 @@ public class GameBoy {
 
     public GameBoy(Cartridge cartridge) {
         this.cartridge = cartridge;
-        
+
         CPURegisters cpuRegisters = new CPURegisters();
         PPURegisters ppuRegisters = new PPURegisters();
         OAM oam = new OAM();
@@ -39,11 +40,16 @@ public class GameBoy {
             int cycles = cpu.step();
             ppu.step(cycles);
 
+            // Notify the UI that a new Frame is ready
+            if (ppu.isFrameReady()) {
+                notifyObserver();
+            }
+
             // try {
-            //     Thread.sleep(100);
+            // Thread.sleep(100);
             // } catch (InterruptedException e) {
-            //     // TODO Auto-generated catch block
-            //     e.printStackTrace();
+            // // TODO Auto-generated catch block
+            // e.printStackTrace();
             // }
 
             // future: timers.step(), input.step()
@@ -64,5 +70,14 @@ public class GameBoy {
 
     public int[] getScreen() {
         return ppu.getFrame();
+    }
+
+    public void setObsever(FrameObserver observer) {
+        this.observer = observer;
+    }
+
+    private void notifyObserver() {
+        int[] frame = ppu.getFrame();
+        observer.onFrameReady(frame);
     }
 }
