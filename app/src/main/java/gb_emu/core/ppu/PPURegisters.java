@@ -2,7 +2,7 @@ package gb_emu.core.ppu;
 
 public class PPURegisters {
     private int LCDC = 0x91; // (0xFF40) LCD Control
-    private int STAT = 0x00; // (0xFF41) LCD Status
+    private int STAT = 0x85; // (0xFF41) LCD Status
     private int SCY = 0x00; // (0xFF42) Scroll Y
     private int SCX = 0x00; // (0xFF43) Scroll X
     private int LY = 0x00; // (0xFF44) Current line
