@@ -3,16 +3,26 @@ package gb_emu.core.ppu;
 import gb_emu.core.mem.RAM;
 
 public class VRAM extends RAM {
-    public static final int VRAM_CAPACITY = 0x2000; // 8KB
-    public static final int VRAM_OFFSET = 0x8000;
-    public static final int TILE_LENGHT = 16; // 16 bytes
+    public static final int CAPACITY = 0x2000; // 8KB
+    public static final int OFFSET = 0x8000;
+    public static final int TILE_SIZE = 16; // 16 bytes per tile
 
     public VRAM() {
-        super(VRAM_CAPACITY, VRAM_OFFSET);
+        super(CAPACITY, OFFSET);
+
+        // Work that should be done by the bootRom (opicional)
+        initialize();
+    }
+
+    private void initialize() {
+        // Fill VRAM with default values
+        for (int i = 0; i < CAPACITY; i++) {
+            write(OFFSET + i, 0x00);
+        }
     }
 
     public int readTileByte(int tileIndex, int byteOffset) {
-        int address = VRAM_OFFSET + tileIndex * TILE_LENGHT + byteOffset;
+        int address = OFFSET + tileIndex * TILE_SIZE + byteOffset;
         return read(address);
     }
 
