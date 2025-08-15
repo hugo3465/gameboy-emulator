@@ -38,27 +38,35 @@ public class CPU implements Serializable {
             // Handle Timer (Not implemented)
 
             handleInterrupts();
-        }
 
-        // LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
-        // LOGGER.debug("PC: " + String.format("0x%04X", pc));
+        } else {
+            shouldWakeUp();
+        }
 
         return cycles;
     }
 
     private int executeInstruction() {
         boolean isPrefixCbInstruction = false;
-        int opcode = mmu.read(registers.getPC());
-        registers.incrementPC();
+        int opcode = readOpcode();
 
         if (opcode == 0xCB) { // PREFIX CB
-            opcode = mmu.read(registers.getPC());
-            registers.incrementPC();
+            opcode = readOpcode();
             isPrefixCbInstruction = true;
-            // LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", cbOpcode));
+            LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", opcode));
+        } else {
+            LOGGER.debug("Opcode: " + String.format("0x%02X", opcode));
         }
 
+        LOGGER.debug("PC: " + String.format("0x%04X", registers.getPC()));
+
         return instructionsMap.execute(opcode, isPrefixCbInstruction);
+    }
+
+    private int readOpcode() {
+        int opcode = mmu.read(registers.getPC());
+        registers.incrementPC();
+        return opcode;
     }
 
     /**
@@ -68,20 +76,27 @@ public class CPU implements Serializable {
      */
     private boolean shouldWakeUp() {
         // Check for pending interrupts
-        int interruptEnable = mmu.read(0xFFFF) & 0xFF; // IE register
-        int interruptFlags = mmu.read(0xFF0F) & 0xFF; // IF register
+        int interruptEnable = registers.getInterruptEnable(); // IE register
+        int interruptFlags = registers.getInterruptFlags(); // IF register
+
+        // LOGGER.debug("Interrupt Enable (IE): 0x" + String.format("%02X",
+        // interruptEnable));
+        // LOGGER.debug("Interrupt Flags (IF): 0x" + String.format("%02X",
+        // interruptFlags));
 
         // If any enabled interrupt is pending, wake up
         boolean hasInterrupt = (interruptEnable & interruptFlags) != 0;
 
-        // For STOP mode, also check for joypad input (button press)
+        // For STOP mode, also check for joypad input (bit 4)
         if (stopped) {
-            // Joypad interrupt (bit 4) can wake from STOP
             boolean joypadInterrupt = (interruptEnable & interruptFlags & 0x10) != 0;
-            return joypadInterrupt;
+            if (joypadInterrupt) {
+                LOGGER.debug("Joypad interrupt detected, waking up from STOP.");
+                stopped = false; // wakey-wakey
+                return true;
+            }
         }
 
-        // For HALT mode, any interrupt can wake up
         return hasInterrupt;
     }
 
@@ -93,8 +108,8 @@ public class CPU implements Serializable {
             return;
         }
 
-        int interruptEnable = mmu.read(0xFFFF) & 0xFF; // IE register
-        int interruptFlags = mmu.read(0xFF0F) & 0xFF; // IF register
+        int interruptEnable = registers.getInterruptEnable(); // IE register
+        int interruptFlags = registers.getInterruptFlags(); // IF register
 
         int pendingInterrupts = interruptEnable & interruptFlags;
 
@@ -151,6 +166,10 @@ public class CPU implements Serializable {
 
     public boolean isInterruptsEnabled() {
         return interruptsEnabled;
+    }
+
+    public CPURegisters getRegisters() {
+        return registers;
     }
 
     public void setInterruptsEnabled(boolean interruptsEnabled) {

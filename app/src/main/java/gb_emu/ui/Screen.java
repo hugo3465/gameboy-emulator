@@ -2,24 +2,23 @@ package gb_emu.ui;
 
 import javax.swing.*;
 
-import gb_emu.core.GameBoy;
+import gb_emu.core.FrameObserver;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Screen extends JPanel {
+public class Screen extends JPanel implements FrameObserver {
 
     private BufferedImage image;
-    private GameBoy gb;
 
-    public Screen(int width, int height, GameBoy gb) {
-        this.gb = gb;
+    public Screen(int width, int height) {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         setPreferredSize(new Dimension(width * 2, height * 2)); // zoom opcional
     }
 
-    public void updatePixels(int[] pixels) {
-        image.setRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
+    @Override
+    public void onFrameReady(int[] frame) {
+        image.setRGB(0, 0, image.getWidth(), image.getHeight(), frame, 0, image.getWidth());
         repaint();
     }
 
@@ -35,17 +34,6 @@ public class Screen extends JPanel {
         frame.add(this);
         frame.pack();
         frame.setVisible(true);
-
-        // Exemplo: preencher a imagem com branco
-        // int[] pixels = new int[160 * 144];
-        // for (int i = 0; i < pixels.length; i++) {
-        // pixels[i] = 0xFFFFFF; // branco
-        // }
-
-        // Atualiza a imagem
-        while (true) {
-            int[] screen = gb.getScreen();
-            this.updatePixels(screen);
-        }
     }
+
 }

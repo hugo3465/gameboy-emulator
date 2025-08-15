@@ -21,8 +21,6 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         registers.setFlagZ(result == 0);
         registers.setFlagN(false);
         registers.setFlagH(((value & 0xF) + 1) > 0xF);
-
-        registers.incrementPC();
     }
 
     private void inc16Bit(java.util.function.IntSupplier getter, java.util.function.IntConsumer setter) {
@@ -30,8 +28,6 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         int result = (value + 1) & 0xFFFF;
 
         setter.accept(result);
-
-        registers.incrementPC();
     }
 
     private void dec8Bit(java.util.function.IntSupplier getter, java.util.function.IntConsumer setter) {
@@ -44,8 +40,6 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         registers.setFlagN(true);
         // Half borrow ocorre se o nibble baixo do valor original for 0
         registers.setFlagH((value & 0xF) == 0);
-
-        registers.incrementPC();
     }
 
     private void dec16Bit(java.util.function.IntSupplier getter, java.util.function.IntConsumer setter) {
@@ -53,8 +47,6 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         int result = (value - 1) & 0xFFFF;
 
         setter.accept(result);
-
-        registers.incrementPC();
     }
 
     @Override

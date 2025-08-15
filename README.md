@@ -7,3 +7,4 @@
 - [Game Boy: Complete Technical Reference](https://gekkio.fi/files/gb-docs/gbctr.pdf)
 - [Coffee-gb](https://github.com/trekawek/coffee-gb)
 - [Java-gb](https://github.com/pmcanseco/java-gb)
+- [gameboy.live](https://github.com/HFO4/gameboy.live/tree/master)

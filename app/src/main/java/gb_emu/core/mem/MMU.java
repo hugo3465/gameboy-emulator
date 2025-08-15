@@ -1,11 +1,13 @@
 package gb_emu.core.mem;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gb_emu.core.cpu.CPURegisters;
 import gb_emu.core.mem.cartridge.Cartridge;
-import gb_emu.core.ppu.PPU;
+import gb_emu.core.ppu.VRAM;
+import gb_emu.core.ppu.PPURegisters;
+import gb_emu.core.ppu.OAM;
 
 /**
  * MMU serves as a mediator between the CPU and the memmory.
@@ -22,28 +24,44 @@ public class MMU {
     private static final int ECHO_RAM_TO_WRAM_SHIFT = 0x2000;
 
     private Cartridge cartridge;
-    private PPU ppu;
+    private CPURegisters cpuRegisters;
+    private PPURegisters ppuRegisters;
+    private OAM oam;
+    private VRAM vram;
     private RAM wram; // Work RAM
     private RAM hram; // High RAM
-    private byte interruptEnable = 0;
 
     // Not implemented
     // private Registers registers; // acho que não coloquei os registers certos,
     // não são de IO estes
 
-    public MMU(Cartridge cartridge, PPU ppu) {
+    public MMU(Cartridge cartridge, CPURegisters cpuRegisters, PPURegisters ppuRegisters, VRAM vram, OAM oam) {
         this.cartridge = cartridge;
-        this.ppu = ppu;
+        this.cpuRegisters = cpuRegisters;
+        this.ppuRegisters = ppuRegisters;
+        this.vram = vram;
+        this.oam = oam;
 
         this.wram = new RAM(WORK_RAM_LENGHT, WORK_RAM_OFFSET);
         this.hram = new RAM(HIGH_RAM_LENGHT, HIGH_RAM_OFFSET);
+
+        // TODO remove after Timer implementation
+        // Inicialize timer registers
+        write(0xFF04, 0x00); // DIV (Divider Register)
+        write(0xFF05, 0x00); // TIMA (Timer Counter)
+        write(0xFF06, 0x00); // TMA (Timer Modulo)
+        write(0xFF07, 0x00); // TAC (Timer Control)
     }
 
     public int read(int address) {
-        if (address >= 0x0000 && address <= 0x7FFF) {
+        if (address == 0xFF0F) { // IF register
+            return cpuRegisters.getInterruptFlags();
+        } else if (address == 0xFFFF) { // IE register
+            return cpuRegisters.getInterruptEnable();
+        } else if (address >= 0x0000 && address <= 0x7FFF) {
             return cartridge.read(address);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
-            return ppu.readVRAM(address);
+            return vram.read(address);
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             return cartridge.read(address); // external RAM
         } else if (address >= 0xC000 && address <= 0xDFFF) {
@@ -51,14 +69,15 @@ public class MMU {
         } else if (address >= 0xE000 && address <= 0xFDFF) {
             return wram.read(address - ECHO_RAM_TO_WRAM_SHIFT); // Echo RAM
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            return ppu.readOAM(address);
+            return oam.read(address);
+        } else if (address >= 0xFF40 && address <= 0xFF4B) {
+            return ppuRegisters.readRegister(address);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
-            // return registers.read(address);
-            return 0xFF; // TODO implement it later
+            // LOGGER.warn(String.format("Leitura de registo não implementado: 0x%04X",
+            // address));
+            return 0xFF; // TODO implementar futuramente
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             return hram.read(address);
-        } else if (address == 0xFFFF) {
-            return Byte.toUnsignedInt(interruptEnable);
         } else {
             LOGGER.warn(String.format("Attempted to read out-of-bounds address: 0x%04X", address));
             return 0xFF;
@@ -66,26 +85,30 @@ public class MMU {
     }
 
     public void write(int address, int value) {
-        value &= 0xFF; // guarantees 8-bit value
+        value &= 0xFF; // garante valor 8 bits
 
-        if (address >= 0x0000 && address <= 0x7FFF) {
+        if (address == 0xFF0F) { // IF register
+            cpuRegisters.setInterruptFlags(value);
+        } else if (address == 0xFFFF) { // IE register
+            cpuRegisters.setInterruptEnable(value);
+        } else if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
         } else if (address >= 0x8000 && address <= 0x9FFF) {
-            ppu.writeVRAM(address, value);
+            vram.write(address, value);
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             cartridge.write(address, value);
         } else if (address >= 0xC000 && address <= 0xDFFF) {
             wram.write(address, value);
         } else if (address >= 0xE000 && address <= 0xFDFF) {
-            wram.write((address - ECHO_RAM_TO_WRAM_SHIFT), value);
+            wram.write(address - ECHO_RAM_TO_WRAM_SHIFT, value);
         } else if (address >= 0xFE00 && address <= 0xFE9F) {
-            ppu.writeOAM(address, value);
+            oam.write(address, value);
+        } else if (address >= 0xFF40 && address <= 0xFF4B) {
+            ppuRegisters.writeRegister(address, value);
         } else if (address >= 0xFF00 && address <= 0xFF7F) {
-            // registers.write(address, value);
+            // registers.write(address, value); // ainda não implementado
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             hram.write(address, value);
-        } else if (address == 0xFFFF) {
-            interruptEnable = (byte) value;
         }
     }
 }

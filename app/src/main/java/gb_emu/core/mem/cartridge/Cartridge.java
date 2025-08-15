@@ -18,6 +18,7 @@ public class Cartridge implements Serializable {
     private byte[] romData;
     private byte[] botRom;
     private RAM externalRAM;
+    private boolean bootRomEnabled = true;
 
     public Cartridge(String romPath, String botRomPath) {
         this.romData = loadFile(romPath);
@@ -178,10 +179,11 @@ public class Cartridge implements Serializable {
     }
 
     public int read(int address) {
-        if (!gbc && address >= 0x0000 && address < 0x0100) {
+        if (!gbc && bootRomEnabled && address >= 0x0000 && address < 0x0100) {
             return Byte.toUnsignedInt(botRom[address]);
         } else if (address == 0xFF50) {
-            return 0xFF;
+            LOGGER.debug("[READ] FF50 -> bootRomEnabled=" + bootRomEnabled);
+            return bootRomEnabled ? 0x00 : 0x01;
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             if (externalRAM == null) {
                 // LOGGER.warn("Attempted to read from non-existent external RAM at 0x" +
@@ -190,12 +192,20 @@ public class Cartridge implements Serializable {
             }
             return externalRAM.read(address);
         } else {
+            LOGGER.debug("[READ] ROM address 0x%04X = 0x%02X%n", address, Byte.toUnsignedInt(romData[address]));
+
             return Byte.toUnsignedInt(romData[address]);
         }
     }
 
     public void write(int address, int value) {
         CartridgeType cartridgeType = getCartridgeType();
+
+        if (address == 0xFF50) {
+            bootRomEnabled = false;
+            LOGGER.debug("[WRITE] FF50 -> bootRomEnabled=false");
+            return;
+        }
 
         if (address >= 0xA000 && address <= 0xBFFF && externalRAM != null) {
             externalRAM.write(address, value);

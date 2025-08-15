@@ -2,7 +2,7 @@ package gb_emu.core.cpu;
 
 public class CPURegisters {
     private static final int STACK_POINTER_INITIAL_ADDRESS = 0xfffe;
-    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0000; // start at 0x0100
+    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0100; // start at 0x0100
     private static final int AF_INITIAL_ADDRESS = 0x01b0;
     private static final int BC_INITIAL_ADDRESS = 0x0013;
     private static final int DE_INITIAL_ADDRESS = 0x00d8;
@@ -28,6 +28,9 @@ public class CPURegisters {
     private boolean cf; // carry flag
     private boolean hf; // half carry flag
     private boolean halt;
+
+    private int interruptEnable = 0x00; // IE register
+    private int interruptFlags = 0xE1; // IF register
 
     public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;
@@ -321,5 +324,21 @@ public class CPURegisters {
 
     public void setFlagH(boolean value) {
         hf = value;
+    }
+
+    public int getInterruptEnable() {
+        return interruptEnable & 0xFF;
+    }
+
+    public void setInterruptEnable(int value) {
+        interruptEnable = value & 0xFF;
+    }
+
+    public int getInterruptFlags() {
+        return interruptFlags & 0xFF;
+    }
+
+    public void setInterruptFlags(int value) {
+        interruptFlags = value & 0xFF;
     }
 }
