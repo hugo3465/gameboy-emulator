@@ -14,6 +14,11 @@ public class RAM implements Serializable {
     public RAM(int length, int offset) {
         this.mem = new int[length];
         this.offset = offset;
+
+        // Initialize RAM with default values
+        for (int i = 0; i < length; i++) {
+            mem[i] = 0x00;
+        }
     }
 
     public void write(int address, int value) {
