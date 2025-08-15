@@ -9,7 +9,6 @@ import gb_emu.core.ppu.VRAM;
 import gb_emu.core.ppu.PPURegisters;
 import gb_emu.core.ppu.OAM;
 
-
 /**
  * MMU serves as a mediator between the CPU and the memmory.
  * So the CPU does not have to know the origin of the memmory, that could be
@@ -45,6 +44,13 @@ public class MMU {
 
         this.wram = new RAM(WORK_RAM_LENGHT, WORK_RAM_OFFSET);
         this.hram = new RAM(HIGH_RAM_LENGHT, HIGH_RAM_OFFSET);
+
+        // TODO remove after Timer implementation
+        // Inicialize timer registers
+        write(0xFF04, 0x00); // DIV (Divider Register)
+        write(0xFF05, 0x00); // TIMA (Timer Counter)
+        write(0xFF06, 0x00); // TMA (Timer Modulo)
+        write(0xFF07, 0x00); // TAC (Timer Control)
     }
 
     public int read(int address) {
