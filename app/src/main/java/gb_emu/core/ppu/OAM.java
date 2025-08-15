@@ -8,10 +8,15 @@ import gb_emu.core.mem.RAM;
 public class OAM extends RAM {
     private static final int OAM_CAPACITY = 0xA0; // 160 bytes
     private static final int OAM_OFFSET = 0xFE00;
-    private static final int SPRITE_LENGHT = 4; //4 bytes
+    private static final int SPRITE_LENGHT = 4; // 4 bytes
 
     public OAM() {
         super(OAM_CAPACITY, OAM_OFFSET);
+
+        // Initialize OAM with default values
+        for (int i = 0; i < 0xA0; i++) {
+            write(0xFE00 + i, 0x00);
+        }
     }
 
     public List<SpriteObject> getAllSprites() {
