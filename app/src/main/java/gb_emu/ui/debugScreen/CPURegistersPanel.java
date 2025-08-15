@@ -33,6 +33,9 @@ public class CPURegistersPanel extends JPanel {
         addRegister("DE", registers.getDE());
         addRegister("HL", registers.getHL());
         addRegister("AF", registers.getAF());
+        addRegister("IE", registers.getInterruptEnable());
+        addRegister("IF", registers.getInterruptFlags());
+
     }
 
     private void addRegister(String name, int value) {
@@ -60,5 +63,7 @@ public class CPURegistersPanel extends JPanel {
         registerLabels.get("DE").setText(String.format("0x%04X", registers.getDE()));
         registerLabels.get("HL").setText(String.format("0x%04X", registers.getHL()));
         registerLabels.get("AF").setText(String.format("0x%04X", registers.getAF()));
+        registerLabels.get("IE").setText(String.format("0x%04X", registers.getInterruptEnable()));
+        registerLabels.get("IF").setText(String.format("0x%04X", registers.getInterruptFlags()));
     }
 }

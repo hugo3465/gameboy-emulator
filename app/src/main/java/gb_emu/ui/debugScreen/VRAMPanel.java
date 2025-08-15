@@ -44,7 +44,7 @@ public class VRAMPanel extends JPanel {
         StringBuilder tileDataBuilder = new StringBuilder();
         for (int tileIndex = 0; tileIndex < 384; tileIndex++) { // 384 tiles in VRAM
             tileDataBuilder.append(String.format("Tile %03d: ", tileIndex));
-            for (int byteOffset = 0; byteOffset < VRAM.TILE_LENGHT; byteOffset++) {
+            for (int byteOffset = 0; byteOffset < VRAM.TILE_SIZE; byteOffset++) {
                 tileDataBuilder.append(String.format("%02X ", vram.readTileByte(tileIndex, byteOffset)));
             }
             tileDataBuilder.append("\n");

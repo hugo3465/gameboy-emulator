@@ -5,6 +5,19 @@ import gb_emu.core.ppu.modes.PixelTransferHandler;
 import gb_emu.core.mem.MMU;
 
 public class PPU {
+    private static final int LCDC_INITIAL_VALUE = 0x91;
+    private static final int SCROLL_Y_INITIAL_VALUE = 0;
+    private static final int SCROLL_X_INITIAL_VALUE = 0;
+    private static final int BGP_INITIAL_VALUE = 0xFC;
+
+    private static final int OAM_SEARCH_CYCLES = 80;
+    private static final int PIXEL_TRANSFER_CYCLES = 172;
+    private static final int HBLANK_CYCLES = 204;
+    private static final int LINE_CYCLES = 456;
+    private static final int VBLANK_LINES_START = 144;
+    private static final int VBLANK_LINES_END = 153;
+    private static final int TOTAL_LINES = 154;
+
     private enum Mode {
         OAM_SEARCH, // 2
         PIXEL_TRANSFER, // 3
@@ -24,6 +37,7 @@ public class PPU {
 
     private OAMSearchHandler oamSearchHandler;
     private PixelTransferHandler pixelTransferHandler;
+    private boolean frameReady = false;
 
     public PPU(PPURegisters ppuRegisters, VRAM vram, OAM oam, MMU mmu) {
         this.vRam = vram;
@@ -40,10 +54,10 @@ public class PPU {
         this.pixelTransferHandler = new PixelTransferHandler(vRam, oam, registers, screen, bgPalette);
 
         // Initialize registers essential for LCD operation
-        registers.setLCDC(0x91); // LCDC on
-        registers.setSCY(0); // Scroll Y
-        registers.setSCX(0); // Scroll X
-        registers.setBGP(0xFC); // Default Pallete fot he background
+        registers.setLCDC(LCDC_INITIAL_VALUE); // LCDC on
+        registers.setSCY(SCROLL_Y_INITIAL_VALUE); // Scroll Y
+        registers.setSCX(SCROLL_X_INITIAL_VALUE); // Scroll X
+        registers.setBGP(BGP_INITIAL_VALUE); // Default Pallete fot he background
     }
 
     public void step(int cycles) {
@@ -53,42 +67,62 @@ public class PPU {
         switch (oldMode) {
             case OAM_SEARCH:
                 oamSearchHandler.tick();
-                currentMode = Mode.PIXEL_TRANSFER;
+                if (modeClock >= OAM_SEARCH_CYCLES) {
+                    modeClock -= OAM_SEARCH_CYCLES;
+                    currentMode = Mode.PIXEL_TRANSFER;
+
+                }
                 break;
 
             case PIXEL_TRANSFER:
                 pixelTransferHandler.tick();
-                currentMode = Mode.HBLANK;
+                if (modeClock >= PIXEL_TRANSFER_CYCLES) {
+                    modeClock -= PIXEL_TRANSFER_CYCLES;
+                    currentMode = Mode.HBLANK;
+                }
                 break;
 
             case HBLANK:
                 // Acho que falta alguma coisa antes
 
-                registers.incrementLY();
-                if (registers.getLY() < 144) {
-                    currentMode = Mode.OAM_SEARCH;
-                } else if (registers.getLY() == 144) {
-                    currentMode = Mode.VBLANK;
+                if (modeClock >= HBLANK_CYCLES) {
+                    modeClock -= HBLANK_CYCLES;
+                    registers.incrementLY();
+
+                    if (registers.getLY() < VBLANK_LINES_START) {
+                        currentMode = Mode.OAM_SEARCH;
+                    } else if (registers.getLY() == VBLANK_LINES_START) {
+                        currentMode = Mode.VBLANK;
+                        triggerVBlankInterrupt();
+                        frameReady = true;
+                    }
                 }
                 break;
 
             case VBLANK:
-                if (registers.getLY() == 144) {
-                    // set IF register to 0 (interupt VBlank)
-                    mmu.write(0xFF0F, 0);
-                }
+                // if (registers.getLY() == 144) {
+                // // set IF register to 0 (interupt VBlank)
+                // mmu.write(0xFF0F, 0);
+                // }
 
-                if (modeClock >= 456) {
-                    modeClock = 0;
+                if (modeClock >= LINE_CYCLES) {
+                    modeClock -= LINE_CYCLES;
                     registers.incrementLY();
 
-                    if (registers.getLY() == 153) {
+                    if (registers.getLY() > VBLANK_LINES_END) { // resets the square
                         registers.setLY(0);
                         currentMode = Mode.OAM_SEARCH;
+                        frameReady = false;
                     }
                 }
                 break;
         }
+    }
+
+    private void triggerVBlankInterrupt() {
+        // Set bit 0 of the IF register (0xFF0F) to signal the interrupt of VBlank
+        int interruptFlags = mmu.read(0xFF0F);
+        mmu.write(0xFF0F, interruptFlags | 0x01);
     }
 
     public int[] getFrame() {
@@ -109,5 +143,13 @@ public class PPU {
 
     public PPURegisters getRegisters() {
         return registers;
+    }
+
+    public boolean isFrameReady() {
+        return frameReady;
+    }
+
+    public void resetFrameReady() {
+        frameReady = false;
     }
 }
