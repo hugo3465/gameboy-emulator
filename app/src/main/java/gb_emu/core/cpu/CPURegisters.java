@@ -29,8 +29,8 @@ public class CPURegisters {
     private boolean hf; // half carry flag
     private boolean halt;
 
-    private int interruptEnable = 0; // IE register
-    private int interruptFlags = 0; // IF register
+    private int interruptEnable = 0x00; // IE register
+    private int interruptFlags = 0xE1; // IF register
 
     public CPURegisters() {
         this.sp = STACK_POINTER_INITIAL_ADDRESS;

@@ -48,12 +48,10 @@ public class CPU implements Serializable {
 
     private int executeInstruction() {
         boolean isPrefixCbInstruction = false;
-        int opcode = mmu.read(registers.getPC());
-        registers.incrementPC();
+        int opcode = readOpcode();
 
         if (opcode == 0xCB) { // PREFIX CB
-            opcode = mmu.read(registers.getPC());
-            registers.incrementPC();
+            opcode = readOpcode();
             isPrefixCbInstruction = true;
             LOGGER.debug("CB-Prefixed Opcode: " + String.format("0x%02X", opcode));
         } else {
@@ -63,6 +61,12 @@ public class CPU implements Serializable {
         LOGGER.debug("PC: " + String.format("0x%04X", registers.getPC()));
 
         return instructionsMap.execute(opcode, isPrefixCbInstruction);
+    }
+
+    private int readOpcode() {
+        int opcode = mmu.read(registers.getPC());
+        registers.incrementPC();
+        return opcode;
     }
 
     /**
