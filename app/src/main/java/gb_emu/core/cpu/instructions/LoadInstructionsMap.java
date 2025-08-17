@@ -34,7 +34,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
     private void ld_r_pair(Consumer<Integer> setter, Supplier<Integer> getPair) {
         int pair = getPair.get();
         int value = mmu.read(pair);
-        registers.setB(value);
+        setter.accept(value);
     }
 
     private void ld_pair_r(Supplier<Integer> getPair, Supplier<Integer> getReg) {

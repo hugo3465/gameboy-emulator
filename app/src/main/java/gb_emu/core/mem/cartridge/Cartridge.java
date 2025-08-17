@@ -192,8 +192,6 @@ public class Cartridge implements Serializable {
             }
             return externalRAM.read(address);
         } else {
-            LOGGER.debug("[READ] ROM address 0x%04X = 0x%02X%n", address, Byte.toUnsignedInt(romData[address]));
-
             return Byte.toUnsignedInt(romData[address]);
         }
     }
