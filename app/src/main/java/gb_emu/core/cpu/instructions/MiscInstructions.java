@@ -24,6 +24,10 @@ public class MiscInstructions extends AbstractInstruction implements Instruction
             cpu.setStopped(true);
         }, 4)); // STOP 0
 
+        functions.put(0xFB, wrap(() -> {
+            cpu.setEnableInterruptsNextInstruction(true);
+        }, 4));
+
         functions.put(0xDD, wrap(() -> {
             // undocumented, so is treated as a NOP
         }, 4));

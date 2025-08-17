@@ -15,6 +15,7 @@ public class CPU implements Serializable {
     private MMU mmu;
     private InstructionsMap instructionsMap;
     private boolean stopped = false;
+    private boolean enableInterruptsNextInstruction = false;
     private boolean interruptsEnabled = true;
 
     public CPU(MMU mmu, CPURegisters registers) {
@@ -25,6 +26,13 @@ public class CPU implements Serializable {
     }
 
     public int step() {
+        // Enable interrupts before executing the new instruction (0xFB - EI instruction
+        // behavior)
+        if (enableInterruptsNextInstruction) {
+            interruptsEnabled = true;
+            enableInterruptsNextInstruction = false;
+        }
+
         boolean halt = registers.getHalt();
         int cycles = 0;
 
@@ -158,6 +166,10 @@ public class CPU implements Serializable {
 
     public boolean isStopped() {
         return stopped;
+    }
+
+    public void setEnableInterruptsNextInstruction(boolean value) {
+        this.enableInterruptsNextInstruction = value;
     }
 
     public void setStopped(boolean stopped) {

@@ -7,10 +7,8 @@ import java.awt.*;
 
 public class DebugScreen extends JFrame {
 
-    private GameBoy gb;
 
     public DebugScreen(GameBoy gb) {
-        this.gb = gb;
         setTitle("Debug - Game Boy Emulator");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600, 400);
@@ -57,7 +55,7 @@ public class DebugScreen extends JFrame {
                     // Update HRAM
                     // hramText.setText(gb.getMemory().getHramDump());
 
-                    Thread.sleep(500); // Update every 500ms
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
