@@ -100,9 +100,8 @@ public class GameBoy {
      * Notify all registered observers that a new frame is ready.
      */
     private void notifyObservers() {
-        int[] frame = ppu.getFrame();
         for (FrameObserver observer : observers) {
-            observer.onFrameReady(frame);
+            observer.onFrameReady();
         }
     }
 }

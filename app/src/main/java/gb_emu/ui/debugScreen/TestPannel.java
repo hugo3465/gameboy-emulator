@@ -7,8 +7,9 @@ import javax.swing.JPanel;
 
 import gb_emu.core.FrameObserver;
 import gb_emu.core.ppu.VRAM;
+import gb_emu.core.utils.PPUUtils;
 
-public class TestPannel extends JPanel implements FrameObserver{
+public class TestPannel extends JPanel implements FrameObserver {
     private VRAM vram;
     private BufferedImage tile1;
 
@@ -20,8 +21,10 @@ public class TestPannel extends JPanel implements FrameObserver{
     }
 
     @Override
-    public void onFrameReady(int[] frame) {
-        tile1.setRGB(0, 0, tile1.getWidth(), tile1.getHeight(), frame, 0, tile1.getWidth());
+    public void onFrameReady() {
+        int[] tile1Data = vram.getTile(0x8000);
+        int[] tile1Frame = PPUUtils.processTileData(tile1Data);
+        tile1.setRGB(0, 0, 8, 8, tile1Frame, 0, 8);
         repaint();
     }
 
