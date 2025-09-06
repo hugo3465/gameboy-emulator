@@ -40,6 +40,11 @@ public class DebugScreen extends JFrame {
         hramPanel.add(new JScrollPane(hramText), BorderLayout.CENTER);
         tabbedPane.addTab("HRAM", hramPanel);
 
+        // Test Tab
+        TestPannel testPannel = new TestPannel(gb.getPPU().getVram());
+        gb.addObserver(testPannel);
+        tabbedPane.addTab("Test", testPannel);
+
         // Add the tabbed pane to the frame
         add(tabbedPane);
 

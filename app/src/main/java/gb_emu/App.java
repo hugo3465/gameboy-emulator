@@ -21,7 +21,7 @@ public class App {
         debugScreen.setVisible(true);
         
         Screen screen = new Screen(160, 144);
-        gameBoy.setObsever(screen);
+        gameBoy.addObserver(screen);
         screen.start();
         
         gameBoy.start();
