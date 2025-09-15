@@ -34,11 +34,11 @@ public class VRAM extends RAM {
         return read(address);
     }
 
-    public int readTileMap0(int index) {
+    public int readBackgroundTileMap(int index) {
         return read(0x9800 + index);
     }
 
-    public int readTileMap1(int index) {
+    public int readWindowTileMap(int index) {
         return read(0x9C00 + index);
     }
 }

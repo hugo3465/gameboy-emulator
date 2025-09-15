@@ -24,17 +24,17 @@ public class VRAMPanel extends JPanel {
         JScrollPane tileDataScrollPane = new JScrollPane(tileDataText);
         tabbedPane.addTab("Tile Data", tileDataScrollPane);
 
-        // Tile Map 0 Tab
+        // Background Tile Map 0 Tab
         tileMap0Text = new JTextArea();
         tileMap0Text.setEditable(false);
         JScrollPane tileMap0ScrollPane = new JScrollPane(tileMap0Text);
-        tabbedPane.addTab("Tile Map 0", tileMap0ScrollPane);
+        tabbedPane.addTab("Background Tile Map", tileMap0ScrollPane);
 
-        // Tile Map 1 Tab
+        // Window Tile Map 1 Tab
         tileMap1Text = new JTextArea();
         tileMap1Text.setEditable(false);
         JScrollPane tileMap1ScrollPane = new JScrollPane(tileMap1Text);
-        tabbedPane.addTab("Tile Map 1", tileMap1ScrollPane);
+        tabbedPane.addTab("Window Tile Map", tileMap1ScrollPane);
 
         add(tabbedPane, BorderLayout.CENTER);
     }
@@ -55,7 +55,7 @@ public class VRAMPanel extends JPanel {
         StringBuilder tileMap0Builder = new StringBuilder();
         for (int i = 0; i < 1024; i++) { // Tile Map 0 has 1024 entries
             if (i % 32 == 0) tileMap0Builder.append("\n"); // New line every 32 tiles
-            tileMap0Builder.append(String.format("%02X ", vram.readTileMap0(i)));
+            tileMap0Builder.append(String.format("%02X ", vram.readBackgroundTileMap(i)));
         }
         tileMap0Text.setText(tileMap0Builder.toString());
 
@@ -63,7 +63,7 @@ public class VRAMPanel extends JPanel {
         StringBuilder tileMap1Builder = new StringBuilder();
         for (int i = 0; i < 1024; i++) { // Tile Map 1 has 1024 entries
             if (i % 32 == 0) tileMap1Builder.append("\n"); // New line every 32 tiles
-            tileMap1Builder.append(String.format("%02X ", vram.readTileMap1(i)));
+            tileMap1Builder.append(String.format("%02X ", vram.readWindowTileMap(i)));
         }
         tileMap1Text.setText(tileMap1Builder.toString());
     }
