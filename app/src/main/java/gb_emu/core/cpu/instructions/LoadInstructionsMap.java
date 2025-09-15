@@ -217,7 +217,7 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0x12, wrap(() -> ld_pair_r(registers::getDE, registers::getA), 8)); // LD (DE), A
 
         // ===== Special LD instructions =====
-        
+
         functions.put(0x22, wrap(() -> { // LD (HL+), A
             int address = registers.getHL();
             mmu.write(address, registers.getA());
@@ -343,6 +343,12 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int value = pop16();
             registers.setAF(value & 0xFFF0); // clear AF registers
         }, 12));
+
+        functions.put(0x0A, wrap(() -> {
+            int address = registers.getBC();
+            int value = mmu.read(address);
+            registers.setA(value);
+        }, 8)); // LD A, (BC)
 
         /**
          * PUSH
