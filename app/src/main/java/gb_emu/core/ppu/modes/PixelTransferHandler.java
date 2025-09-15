@@ -121,9 +121,4 @@ public class PixelTransferHandler implements PPUMode {
     //     }
     // }
 
-    @Override
-    public void start() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'start'");
-    }
 }

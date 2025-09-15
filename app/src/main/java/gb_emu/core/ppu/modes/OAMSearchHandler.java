@@ -39,12 +39,6 @@ public class OAMSearchHandler implements PPUMode {
         // System.out.println(visibleSprites.toString());
     }
 
-    @Override
-    public void start() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'start'");
-    }
-
     public List<SpriteObject> getVisibleSprites() {
         return this.visibleSprites;
     }
