@@ -56,12 +56,98 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
     @Override
     public void registerAll(HashMap<Integer, Instruction> functions) {
         /**
-         * JP
+         * JP (Jump)
          */
         functions.put(0xC3, wrap(() -> { // JP a16
             int address = readImmediate16();
             registers.setPC(address);
         }, 16));
+
+        functions.put(0xE9, wrap(() -> { // JP (HL)
+            int address = registers.getHL();
+            registers.setPC(address);
+        }, 4));
+
+        functions.put(0xC2, () -> { // JP NZ, a16
+            int address = readImmediate16();
+            if (!registers.getFlagZ()) {
+                registers.setPC(address);
+                return 16;
+            } else {
+                return 12;
+            }
+        });
+
+        functions.put(0xCA, () -> { // JP Z, a16
+            int address = readImmediate16();
+            if (registers.getFlagZ()) {
+                registers.setPC(address);
+                return 16;
+            } else {
+                return 12;
+            }
+        });
+
+        functions.put(0xD2, () -> { // JP NC, a16
+            int address = readImmediate16();
+            if (!registers.getFlagC()) {
+                registers.setPC(address);
+                return 16;
+            } else {
+                return 12;
+            }
+        });
+
+        functions.put(0xDA, () -> { // JP C, a16
+            int address = readImmediate16();
+            if (registers.getFlagC()) {
+                registers.setPC(address);
+                return 16;
+            } else {
+                return 12;
+            }
+        });
+
+        /**
+         * JR (Jump Relative)
+         */
+        functions.put(0x18, wrap(() -> { // JR r8 (unconditional jump)
+            byte offset = (byte) readImmediate8(); // signed 8-bit offset
+            int pc = registers.getPC();
+            registers.setPC((pc + offset) & 0xFFFF);
+        }, 12));
+
+        functions.put(0x20, wrap(() -> { // JR NZ, r8
+            byte offset = (byte) readImmediate8();
+            if (!registers.getFlagZ()) {
+                int pc = registers.getPC();
+                registers.setPC((pc + offset) & 0xFFFF);
+            }
+        }, 12));
+
+        functions.put(0x28, wrap(() -> { // JR Z, r8
+            byte offset = (byte) readImmediate8();
+            if (registers.getFlagZ()) {
+                int pc = registers.getPC();
+                registers.setPC((pc + offset) & 0xFFFF);
+            }
+        }, 12));
+
+        functions.put(0x30, wrap(() -> { // JR NC, r8
+            byte offset = (byte) readImmediate8();
+            if (!registers.getFlagC()) {
+                int pc = registers.getPC();
+                registers.setPC((pc + offset) & 0xFFFF);
+            }
+        }, 12));
+
+        functions.put(0x38, wrap(() -> { // JR C, r8
+            byte offset = (byte) readImmediate8();
+            if (registers.getFlagC()) {
+                int pc = registers.getPC();
+                registers.setPC((pc + offset) & 0xFFFF);
+            }
+        }, 12));
 
         /**
          * JR
