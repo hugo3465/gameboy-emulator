@@ -93,7 +93,7 @@ public class MMU {
             cpuRegisters.setInterruptEnable(value);
         } else if (address >= 0x0000 && address <= 0x7FFF) {
             cartridge.write(address, value);
-        } else if (address >= 0x8000 && address <= 0x9FFF) {
+        } else if (address >= 0x8000 && address <= 0x9FFF && canAccessVRAM()) {
             vram.write(address, value);
         } else if (address >= 0xA000 && address <= 0xBFFF) {
             cartridge.write(address, value);
@@ -110,5 +110,11 @@ public class MMU {
         } else if (address >= 0xFF80 && address <= 0xFFFE) {
             hram.write(address, value);
         }
+    }
+
+    private boolean canAccessVRAM() {
+        // verify PPU mode
+        int mode =  ppuRegisters.getSTAT() & 0x03;
+        return mode != 3; // deny access during PIXEL_TRANSFER mode (3)
     }
 }
