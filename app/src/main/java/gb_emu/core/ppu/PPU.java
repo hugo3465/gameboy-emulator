@@ -152,4 +152,8 @@ public class PPU {
     public void resetFrameReady() {
         frameReady = false;
     }
+
+    public Palette getBgPalette() {
+        return bgPalette;
+    }
 }

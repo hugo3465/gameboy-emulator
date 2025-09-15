@@ -41,7 +41,7 @@ public class DebugScreen extends JFrame {
         tabbedPane.addTab("HRAM", hramPanel);
 
         // Test Tab
-        TestPannel testPannel = new TestPannel(gb.getPPU().getVram());
+        TestPannel testPannel = new TestPannel(gb.getPPU().getVram(), gb.getPPU().getBgPalette());
         gb.addObserver(testPannel);
         tabbedPane.addTab("Test", testPannel);
 
