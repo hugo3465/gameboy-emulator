@@ -55,5 +55,17 @@ public class MiscInstructions extends AbstractInstruction implements Instruction
         functions.put(0xED, wrap(() -> {
             // undocumented, so is treated as a NOP
         }, 4));
+
+        functions.put(0x0F, wrap(() -> {
+            int a = registers.getA();
+            int carry = a & 0x01;
+            a = ((a >> 1) | (carry << 7)) & 0xFF;
+            registers.setA(a);
+
+            registers.setFlagZ(false);   // Zero flag reset
+            registers.setFlagN(false);   // Subtract flag reset
+            registers.setFlagH(false);   // Half Carry flag reset
+            registers.setFlagC(carry != 0);    // Carry flag set if bit 0 was 1
+        }, 4)); // RRCA
     }
 }
