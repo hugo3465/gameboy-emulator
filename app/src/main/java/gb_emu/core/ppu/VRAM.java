@@ -21,6 +21,14 @@ public class VRAM extends RAM {
         }
     }
 
+    public int[] getTile(int startIndex) {
+        int[] tile = new int[TILE_SIZE];
+        for (int i = 0; i < TILE_SIZE; i++) {
+            tile[i] = read(startIndex + i);
+        }
+        return tile;
+    }
+
     public int readTileByte(int tileIndex, int byteOffset) {
         int address = OFFSET + tileIndex * TILE_SIZE + byteOffset;
         return read(address);

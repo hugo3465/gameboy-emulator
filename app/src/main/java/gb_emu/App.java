@@ -20,8 +20,8 @@ public class App {
         DebugScreen debugScreen = new DebugScreen(gameBoy);
         debugScreen.setVisible(true);
         
-        Screen screen = new Screen(160, 144);
-        gameBoy.setObsever(screen);
+        Screen screen = new Screen(gameBoy.getPPU(), 160, 144);
+        gameBoy.addObserver(screen);
         screen.start();
         
         gameBoy.start();
