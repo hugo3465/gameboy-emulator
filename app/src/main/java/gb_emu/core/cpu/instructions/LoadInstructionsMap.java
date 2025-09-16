@@ -250,7 +250,6 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
         functions.put(0xE2, wrap(() -> { // LD (C), A
             int address = 0xFF00 + registers.getC();
             mmu.write(address, registers.getA());
-            registers.incrementPC();
         }, 8));
 
         functions.put(0xEA, wrap(() -> { // LD (a16), A
@@ -268,7 +267,6 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
             int address = 0xFF00 + registers.getC();
             int value = mmu.read(address);
             registers.setA(value);
-            registers.incrementPC();
         }, 8));
 
         functions.put(0xFA, wrap(() -> { // LD A, (a16)
