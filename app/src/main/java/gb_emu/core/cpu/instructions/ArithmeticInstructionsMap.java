@@ -65,8 +65,6 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         registers.setFlagC(result > 0xFFFF);
 
         registers.setHL(result & 0xFFFF);
-        
-        registers.incrementPC();
     }
 
     /**
@@ -184,11 +182,7 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0x85, wrap(() -> add8(registers.getL()), 4)); // ADD A, L
         functions.put(0x86, wrap(() -> add8(mmu.read(registers.getHL())), 8)); // ADD A, (HL)
         functions.put(0x87, wrap(() -> add8(registers.getA()), 4)); // ADD A, A
-
-        functions.put(0xC6, wrap(() -> { // ADD A, d8
-            int value = readImmediate8();
-            add8(value);
-        }, 8));
+        functions.put(0xC6, wrap(() -> add8(readImmediate8()), 8)); // ADD A, d8
 
         // ===== 8-bit ADC (Add with Carry) instructions =====
 
@@ -200,11 +194,7 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0x8D, wrap(() -> adc8(registers.getL()), 4)); // ADC A, L
         functions.put(0x8E, wrap(() -> adc8(mmu.read(registers.getHL())), 8)); // ADC A, (HL)
         functions.put(0x8F, wrap(() -> adc8(registers.getA()), 4)); // ADC A, A
-
-        functions.put(0xCE, wrap(() -> { // ADC A, d8
-            int value = readImmediate8();
-            adc8(value);
-        }, 8));
+        functions.put(0xCE, wrap(() -> adc8(readImmediate8()), 8)); // ADC A, d8
 
         // ===== 16-bit ADD instructions =====
 
@@ -230,11 +220,7 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0x95, wrap(() -> sub8(registers.getL()), 4)); // SUB A, L
         functions.put(0x96, wrap(() -> sub8(mmu.read(registers.getHL())), 8)); // SUB A, (HL)
         functions.put(0x97, wrap(() -> sub8(registers.getA()), 4)); // SUB A, A
-
-        functions.put(0xD6, wrap(() -> { // SUB A, d8
-            int value = readImmediate8();
-            sub8(value);
-        }, 8));
+        functions.put(0xD6, wrap(() -> sub8(readImmediate8()), 8)); // SUB A, d8
 
         // ===== 8-bit SBC instructions =====
 
@@ -246,69 +232,38 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0x9D, wrap(() -> sbc8(registers.getL()), 4)); // SBC A, L
         functions.put(0x9E, wrap(() -> sbc8(mmu.read(registers.getHL())), 8)); // SBC A, (HL)
         functions.put(0x9F, wrap(() -> sbc8(registers.getA()), 4)); // SBC A, A
-
-        functions.put(0xDE, wrap(() -> { // SBC A, d8
-            int value = readImmediate8();
-            sbc8(value);
-        }, 8));
+        functions.put(0xDE, wrap(() -> sbc8(readImmediate8()), 8)); // SBC A, d8
 
         // CP B - Compare A with B
-        functions.put(0xB8, wrap(() -> {
-            cp(registers.getB());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xB8, wrap(() -> cp(registers.getB()), 4));
 
         // CP C - Compare A with C
-        functions.put(0xB9, wrap(() -> {
-            cp(registers.getC());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xB9, wrap(() -> cp(registers.getC()), 4));
 
         // CP D - Compare A with D
-        functions.put(0xBA, wrap(() -> {
-            cp(registers.getD());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xBA, wrap(() -> cp(registers.getD()), 4));
 
         // CP E - Compare A with E
-        functions.put(0xBB, wrap(() -> {
-            cp(registers.getE());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xBB, wrap(() -> cp(registers.getE()), 4));
 
         // CP H - Compare A with H
-        functions.put(0xBC, wrap(() -> {
-            cp(registers.getH());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xBC, wrap(() -> cp(registers.getH()), 4));
 
         // CP L - Compare A with L
-        functions.put(0xBD, wrap(() -> {
-            cp(registers.getL());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xBD, wrap(() -> cp(registers.getL()), 4));
 
         // CP (HL) - Compare A with value at address HL
         functions.put(0xBE, wrap(() -> {
             int address = registers.getHL();
             int value = mmu.read(address) & 0xFF;
             cp(value);
-            registers.incrementPC();
         }, 8));
 
         // CP A - Compare A with A
-        functions.put(0xBF, wrap(() -> {
-            cp(registers.getA());
-            registers.incrementPC();
-        }, 4));
+        functions.put(0xBF, wrap(() -> cp(registers.getA()), 4));
 
         // CP d8 - Compare A with immediate 8-bit value
-        functions.put(0xFE, wrap(() -> {
-            registers.incrementPC();
-            int value = mmu.read(registers.getPC()) & 0xFF;
-            cp(value);
-            registers.incrementPC();
-        }, 8));
+        functions.put(0xFE, wrap(() -> cp(readImmediate8()), 8));
 
         /**
          * AND
@@ -321,11 +276,7 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0xA5, wrap(() -> and(registers.getL()), 4)); // AND A, L
         functions.put(0xA6, wrap(() -> and(mmu.read(registers.getHL())), 8)); // AND A, (HL)
         functions.put(0xA7, wrap(() -> and(registers.getA()), 4)); // AND A, A
-
-        functions.put(0xE6, wrap(() -> { // AND A, d8
-            int value = readImmediate8();
-            and(value);
-        }, 8));
+        functions.put(0xE6, wrap(() -> and(readImmediate8()), 8)); // AND A, d8
 
         /**
          * OR
@@ -338,36 +289,20 @@ public class ArithmeticInstructionsMap extends AbstractInstruction implements In
         functions.put(0xB5, wrap(() -> or(registers.getL()), 4)); // OR A, L
         functions.put(0xB6, wrap(() -> or(mmu.read(registers.getHL())), 8)); // OR A, (HL)
         functions.put(0xB7, wrap(() -> or(registers.getA()), 4)); // OR A, A
-
-        functions.put(0xF6, wrap(() -> { // OR A, d8
-            int value = readImmediate8();
-            or(value);
-        }, 8));
+        functions.put(0xF6, wrap(() -> or(readImmediate8()), 8)); // OR A, d8
 
         /**
          * XOR
          */
-
         functions.put(0xA8, wrap(() -> xor(registers.getB()), 4)); // XOR A, B
-
         functions.put(0xA9, wrap(() -> xor(registers.getC()), 4)); // XOR A, C
-
         functions.put(0xAA, wrap(() -> xor(registers.getD()), 4)); // XOR A, D
-
         functions.put(0xAB, wrap(() -> xor(registers.getE()), 4)); // XOR A, E
-
         functions.put(0xAC, wrap(() -> xor(registers.getH()), 4)); // XOR A, H
-
         functions.put(0xAD, wrap(() -> xor(registers.getL()), 4)); // XOR A, L
-
         functions.put(0xAE, wrap(() -> xor(mmu.read(registers.getHL())), 8)); // XOR A, (HL)
-
         functions.put(0xAF, wrap(() -> xor(registers.getA()), 4)); // XOR A, A
-
-        functions.put(0xEE, wrap(() -> { // XOR A, d8 (immediate 8-bit)
-            int value = readImmediate8();
-            xor(value);
-        }, 8));
+        functions.put(0xEE, wrap(() -> xor(readImmediate8()), 8)); // XOR A, d8 (immediate 8-bit)
 
         functions.put(0x37, wrap(() -> { // SCF
             registers.setFlagC(true);

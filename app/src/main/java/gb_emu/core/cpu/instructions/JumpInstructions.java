@@ -17,7 +17,7 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         int pc = registers.getPC() + 1;
         int sp = registers.getSP();
 
-        // Push the current PC onto the stack (high byte first, then low byte)
+        // Push return address onto stack (low byte first, then high byte)
         sp = (sp - 1) & 0xFFFF;
         mmu.write(sp, (pc >> 8) & 0xFF); // high byte
         sp = (sp - 1) & 0xFFFF;
@@ -150,59 +150,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
         }, 12));
 
         /**
-         * JR
-         */
-        functions.put(0x18, wrap(() -> { // JR r8 (unconditional jump)
-            byte offset = (byte) readImmediate8(); // signed 8-bit offset
-            int pc = registers.getPC();
-            registers.setPC((pc + offset) & 0xFFFF);
-        }, 12));
-
-        functions.put(0x20, wrap(() -> { // JR NZ, r8
-            byte offset = (byte) readImmediate8();
-            if (!registers.getFlagZ()) {
-                int pc = registers.getPC();
-                registers.setPC((pc + offset) & 0xFFFF);
-            }
-        }, 12));
-
-        functions.put(0x28, wrap(() -> { // JR Z, r8
-            byte offset = (byte) readImmediate8();
-            if (registers.getFlagZ()) {
-                int pc = registers.getPC();
-                registers.setPC((pc + offset) & 0xFFFF);
-            }
-        }, 12));
-
-        functions.put(0x30, wrap(() -> { // JR NC, r8
-            byte offset = (byte) readImmediate8();
-            if (!registers.getFlagC()) {
-                int pc = registers.getPC();
-                registers.setPC((pc + offset) & 0xFFFF);
-            }
-        }, 12));
-
-        functions.put(0x38, wrap(() -> { // JR C, r8
-            byte offset = (byte) readImmediate8();
-            if (registers.getFlagC()) {
-                int pc = registers.getPC();
-                registers.setPC((pc + offset) & 0xFFFF);
-            }
-        }, 12));
-
-        /**
-         * CPL
-         */
-        functions.put(0x2F, wrap(() -> { // CPL
-            int a = registers.getA();
-            a = a ^ 0xFF;
-            registers.setA(a);
-
-            registers.setFlagN(true);
-            registers.setFlagH(true);
-        }, 4));
-
-        /**
          * CALL
          */
         functions.put(0xC4, () -> { // CALL NZ, a16
@@ -249,20 +196,6 @@ public class JumpInstructions extends AbstractInstruction implements Instruction
             int address = readImmediate16();
             call(address);
         }, 24));
-
-        functions.put(0xD9, wrap(() -> { // RETI
-            // Pop low and high bytes from the stack
-            int low = mmu.read(registers.getSP()) & 0xFF;
-            registers.incrementSP();
-            int high = mmu.read(registers.getSP()) & 0xFF;
-            registers.incrementSP();
-
-            // fuse 2 bytes on a 16 bits address
-            int address = (high << 8) | low;
-            registers.setPC(address);
-
-            cpu.setInterruptsEnabled(true);
-        }, 16));
 
         /**
          * RET

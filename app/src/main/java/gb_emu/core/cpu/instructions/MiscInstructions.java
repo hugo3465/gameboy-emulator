@@ -28,17 +28,14 @@ public class MiscInstructions extends AbstractInstruction implements Instruction
             cpu.setEnableInterruptsNextInstruction(true);
         }, 4));
 
-        functions.put(0x0F, wrap(() -> {
+        functions.put(0x2F, wrap(() -> { // CPL
             int a = registers.getA();
-            int carry = a & 0x01;
-            a = ((a >> 1) | (carry << 7)) & 0xFF;
+            a = a ^ 0xFF;
             registers.setA(a);
 
-            registers.setFlagZ(false); // Zero flag reset
-            registers.setFlagN(false); // Subtract flag reset
-            registers.setFlagH(false); // Half Carry flag reset
-            registers.setFlagC(carry != 0); // Carry flag set if bit 0 was 1
-        }, 4)); // RRCA
+            registers.setFlagN(true);
+            registers.setFlagH(true);
+        }, 4));
 
         functions.put(0xDD, wrap(() -> {
             // undocumented, so is treated as a NOP

@@ -53,8 +53,8 @@ public class PrefixCBInstructions extends AbstractInstruction implements Instruc
     }
 
     private void bit(int bit, int value) {
-        boolean isSet = (value & (1 << bit)) == 0;
-        registers.setFlagZ(isSet);
+        boolean isBitZero = (value & (1 << bit)) == 0;
+        registers.setFlagZ(isBitZero);
         registers.setFlagN(false);
         registers.setFlagH(true);
     }
