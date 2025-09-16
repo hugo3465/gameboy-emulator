@@ -30,7 +30,7 @@ public class DebugScreen extends JFrame {
         tabbedPane.addTab("VRAM", vramPanel);
 
         // OAM Tab
-        OAMPanel oamPanel = new OAMPanel(gb.getPPU().getOam());
+        OAMPanel oamPanel = new OAMPanel(gb.getPPU().getOAM());
         tabbedPane.addTab("OAM", oamPanel);
 
         // HRAM Tab

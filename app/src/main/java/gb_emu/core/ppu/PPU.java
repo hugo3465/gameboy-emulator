@@ -100,11 +100,6 @@ public class PPU {
                 break;
 
             case VBLANK:
-                // if (registers.getLY() == 144) {
-                // // set IF register to 0 (interupt VBlank)
-                // mmu.write(0xFF0F, 0);
-                // }
-
                 if (modeClock >= LINE_CYCLES) {
                     modeClock -= LINE_CYCLES;
                     registers.incrementLY();
@@ -134,10 +129,6 @@ public class PPU {
     }
 
     public OAM getOAM() {
-        return oam;
-    }
-
-    public OAM getOam() {
         return oam;
     }
 
