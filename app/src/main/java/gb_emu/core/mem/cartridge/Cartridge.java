@@ -16,13 +16,13 @@ public class Cartridge implements Serializable {
 
     private boolean gbc;
     private byte[] romData;
-    private byte[] botRom;
+    private byte[] bootRom;
     private RAM externalRAM;
     private boolean bootRomEnabled = true;
 
-    public Cartridge(String romPath, String botRomPath) {
+    public Cartridge(String romPath, String bootRomPath) {
         this.romData = loadFile(romPath);
-        this.botRom = loadFile(botRomPath);
+        this.bootRom = loadFile(bootRomPath);
         this.gbc = false;
 
         int externalRamSize = getRAMSize(); // KiB
@@ -179,19 +179,28 @@ public class Cartridge implements Serializable {
     }
 
     public int read(int address) {
-        if (!gbc && bootRomEnabled && address >= 0x0000 && address < 0x0100) {
-            return Byte.toUnsignedInt(botRom[address]);
-        } else if (address == 0xFF50) {
+        if(address == 0xFF50) {
             LOGGER.debug("[READ] FF50 -> bootRomEnabled=" + bootRomEnabled);
             return bootRomEnabled ? 0x00 : 0x01;
-        } else if (address >= 0xA000 && address <= 0xBFFF) {
+        }
+        
+        // Boot ROM 
+        else if (!gbc && bootRomEnabled && address >= 0x0000 && address <= 0x00FF) {
+            return Byte.toUnsignedInt(bootRom[address]);
+        } 
+        
+        // External RAM
+        else if (address >= 0xA000 && address <= 0xBFFF) {
             if (externalRAM == null) {
                 // LOGGER.warn("Attempted to read from non-existent external RAM at 0x" +
                 // Integer.toHexString(address));
                 return 0xFF;
             }
             return externalRAM.read(address);
-        } else {
+        } 
+        
+        // Cartridge ROM
+        else {
             return Byte.toUnsignedInt(romData[address]);
         }
     }
@@ -199,6 +208,7 @@ public class Cartridge implements Serializable {
     public void write(int address, int value) {
         CartridgeType cartridgeType = getCartridgeType();
 
+        // Deactivate BootRom
         if (address == 0xFF50) {
             bootRomEnabled = false;
             LOGGER.debug("[WRITE] FF50 -> bootRomEnabled=false");
@@ -221,4 +231,7 @@ public class Cartridge implements Serializable {
         return romData;
     }
 
+    public byte[] getBootRomData() {
+        return bootRom;
+    }
 }
