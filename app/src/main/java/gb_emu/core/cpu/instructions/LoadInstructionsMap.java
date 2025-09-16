@@ -353,14 +353,18 @@ public class LoadInstructionsMap extends AbstractInstruction implements Instruct
          */
         functions.put(0xC5, wrap(() -> { // PUSH BC
             int value = registers.getBC();
-            registers.decrementSP(2);
-            mmu.write(registers.getSP(), value);
+            registers.decrementSP();
+            mmu.write(registers.getSP(), (value >> 8) & 0xFF); // high Byte
+            registers.decrementSP();
+            mmu.write(registers.getSP(), value & 0xFF); // Low Byte
         }, 16));
 
         functions.put(0xD5, wrap(() -> { // PUSH DE
             int value = registers.getDE();
-            registers.decrementSP(2);
-            mmu.write(registers.getSP(), value);
+            registers.decrementSP();
+            mmu.write(registers.getSP(), (value >> 8) & 0xFF); // high Byte
+            registers.decrementSP();
+            mmu.write(registers.getSP(), value & 0xFF); // Low Byte
         }, 16));
 
         functions.put(0xE5, wrap(() -> { // PUSH HL
