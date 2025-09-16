@@ -65,7 +65,16 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         functions.put(0x2C, wrap(() -> inc8Bit(registers::getL, registers::setL), 4)); // INC L
         functions.put(0x3C, wrap(() -> inc8Bit(registers::getA, registers::setA), 4)); // INC A
         functions.put(0x33, wrap(() -> inc16Bit(registers::getSP, registers::setSP), 8)); // INC SP
-        functions.put(0x34, wrap(() -> inc16Bit(registers::getHL, registers::setHL), 12)); // // INC (HL)
+        functions.put(0x34, wrap(() -> {
+            int address = registers.getHL();
+            int value = mmu.read(address);
+            int result = (value + 1) & 0xFF;
+            mmu.write(address, result);
+
+            registers.setFlagZ(result == 0);
+            registers.setFlagN(false);
+            registers.setFlagH(((value & 0xF) + 1) > 0xF);
+        }, 12)); // INC (HL)
 
         /**
          * DEC
@@ -81,6 +90,15 @@ public class IncDecInstructions extends AbstractInstruction implements Instructi
         functions.put(0x1B, wrap(() -> dec16Bit(registers::getDE, registers::setDE), 8)); // DEC DE
         functions.put(0x2B, wrap(() -> dec16Bit(registers::getHL, registers::setHL), 8)); // DEC HL
         functions.put(0x3B, wrap(() -> dec16Bit(registers::getSP, registers::setSP), 8)); // DEC SP
-        functions.put(0x35, wrap(() -> dec16Bit(registers::getHL, registers::setHL), 12)); // DEC HL
+        functions.put(0x35, wrap(() -> {
+            int address = registers.getHL();
+            int value = mmu.read(address);
+            int result = (value - 1) & 0xFF;
+            mmu.write(address, result);
+
+            registers.setFlagZ(result == 0);
+            registers.setFlagN(true);
+            registers.setFlagH((value & 0xF) == 0);
+        }, 12)); // DEC (HL)
     }
 }
