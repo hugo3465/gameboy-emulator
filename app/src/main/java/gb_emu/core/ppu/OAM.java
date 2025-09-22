@@ -27,7 +27,9 @@ public class OAM extends RAM {
         return sprites;
     }
 
-    public SpriteObject readSpriteObject(int startAddress) {
+    public SpriteObject readSpriteObject(int oamPosition) {
+        int startAddress = oamPosition + OAM_OFFSET;
+        
         int yPos = read(startAddress);
         int xPos = read(startAddress + 1);
         int tileNum = read(startAddress + 2);
