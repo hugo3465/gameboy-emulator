@@ -26,6 +26,22 @@ public class PixelTransferHandler implements PPUMode {
 
     @Override
     public void tick() {
+        // Verificar se o LCD está ligado (bit 7 do LCDC)
+        // if ((registers.getLCDC() & 0x80) == 0) {
+        //     return; // LCD desligado, não renderiza
+        // }
+
+        // Verificar se o background está habilitado
+        if ((registers.getLCDC() & 0x01) == 0) {
+            // Background desabilitado, preencher com branco ou cor de fundo
+            // renderBlankLine();
+            return;
+        }
+
+        renderBackgroundLine();
+    }
+
+    private void renderBackgroundLine() {
         int ly = registers.getLY();
         int scx = registers.getSCX();
         int scy = registers.getSCY();
@@ -42,7 +58,7 @@ public class PixelTransferHandler implements PPUMode {
 
             // Read tile index on the VRAM
             int tileMapBase = registers.getBgTileMapDisplay(); // 0x9800 or 0x9C00
-            int tileIndex = vRam.read(tileMapBase + tileMapIndex - 0x8000);
+            int tileIndex = vRam.read(tileMapBase + tileMapIndex);
 
             // Convert indexes to tile data addresses
             boolean signedIndex = registers.isBgWindowTileDataSigned();

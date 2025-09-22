@@ -28,7 +28,7 @@ public class RAM implements Serializable {
     public int read(int address) {
         int index = address - offset;
         if (index < 0 || index >= mem.length) {
-            // LOGGER.warn("RAM read out of bounds at 0x" + Integer.toHexString(address));
+            LOGGER.warn("RAM read out of bounds at 0x" + Integer.toHexString(address));
             return 0xFF;
         }
         return mem[index];
