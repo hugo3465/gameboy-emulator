@@ -70,7 +70,6 @@ public class PPU {
                 if (modeClock >= OAM_SEARCH_CYCLES) {
                     modeClock -= OAM_SEARCH_CYCLES;
                     currentMode = Mode.PIXEL_TRANSFER;
-
                 }
                 break;
 

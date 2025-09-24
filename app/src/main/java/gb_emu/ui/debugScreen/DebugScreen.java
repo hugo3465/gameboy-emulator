@@ -45,6 +45,11 @@ public class DebugScreen extends JFrame {
         gb.addObserver(testPannel);
         tabbedPane.addTab("Test", testPannel);
 
+        // Test2 Tab
+        TestPannel2 testPannel2 = new TestPannel2(gb.getPPU().getVram(), gb.getPPU().getBgPalette(), gb.getPPU(), 160, 144);
+        gb.addObserver(testPannel2);
+        tabbedPane.addTab("BG Map", testPannel2);
+
         // Add the tabbed pane to the frame
         add(tabbedPane);
 

@@ -1,9 +1,9 @@
 package gb_emu.core.utils;
 
 public class BGMapAttributes {
-
     /**
      * Extracts the priority bit (bit 7).
+     * 
      * @param attrByte The BG Map attribute byte.
      * @return true if the tile has priority over OBJ.
      */
@@ -13,6 +13,7 @@ public class BGMapAttributes {
 
     /**
      * Extracts the vertical flip bit (Y flip, bit 6).
+     * 
      * @param attrByte The BG Map attribute byte.
      * @return true if the tile should be drawn vertically flipped.
      */
@@ -22,6 +23,7 @@ public class BGMapAttributes {
 
     /**
      * Extracts the horizontal flip bit (X flip, bit 5).
+     * 
      * @param attrByte The BG Map attribute byte.
      * @return true if the tile should be drawn horizontally flipped.
      */
@@ -31,6 +33,7 @@ public class BGMapAttributes {
 
     /**
      * Extracts the VRAM bank bit (bit 3).
+     * 
      * @param attrByte The BG Map attribute byte.
      * @return 0 for bank 0, 1 for bank 1.
      */
@@ -40,10 +43,28 @@ public class BGMapAttributes {
 
     /**
      * Extracts the color palette index (bits 0-2).
+     * 
      * @param attrByte The BG Map attribute byte.
      * @return Value from 0 to 7 indicating which palette to use.
      */
     public static int getPaletteIndex(int attrByte) {
         return attrByte & 0x7;
+    }
+
+    /**
+     * Returns the address of the tile data in VRAM for a given tile index and mode.
+     * 
+     * @param tileIndex    The tile index from the BG Map.
+     * @param unsignedMode True for unsigned mode (base 0x8000), false for signed
+     *                     mode (base 0x8800).
+     * @param vramBank     0 for bank 0, 1 for bank 1 (CGB only).
+     * @return The address in VRAM where the tile data starts.
+     */
+    public static int getTileDataAddress(int tileIndex, boolean unsignedMode, int vramBank) {
+        int base = unsignedMode ? 0x8000 : 0x8800;
+        int index = unsignedMode ? tileIndex : (byte) tileIndex; // signed cast for mode 0x8800
+        // Each tile is 16 bytes
+        // TODO For CGB, I will need to add bank offset externally if VRAM is banked
+        return base + (index * 16);
     }
 }

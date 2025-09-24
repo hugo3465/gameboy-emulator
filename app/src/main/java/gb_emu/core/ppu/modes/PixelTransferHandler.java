@@ -5,6 +5,8 @@ import gb_emu.core.ppu.PPURegisters;
 import gb_emu.core.ppu.Palette;
 import gb_emu.core.ppu.Screen;
 import gb_emu.core.ppu.VRAM;
+import gb_emu.core.utils.BGMapAttributes;
+import gb_emu.core.utils.PPUUtils;
 
 public class PixelTransferHandler implements PPUMode {
     public static int NUMBER_OF_TILES = 32;
@@ -28,7 +30,7 @@ public class PixelTransferHandler implements PPUMode {
     public void tick() {
         // Verificar se o LCD está ligado (bit 7 do LCDC)
         // if ((registers.getLCDC() & 0x80) == 0) {
-        //     return; // LCD desligado, não renderiza
+        // return; // LCD desligado, não renderiza
         // }
 
         // Verificar se o background está habilitado
@@ -91,50 +93,51 @@ public class PixelTransferHandler implements PPUMode {
     }
 
     // private void renderScanline() {
-    //     final int LCDC = registers.getLCDC();
-    //     final int SCX = registers.getSCX();
-    //     final int LY = registers.getLY();
-    //     final int SCY = registers.getSCY();
+    // final int LCDC = registers.getLCDC();
+    // final int SCX = registers.getSCX();
+    // final int LY = registers.getLY();
+    // final int SCY = registers.getSCY();
 
-    //     if ((LCDC & 0x01) == 0)
-    //         return; // Background display is disabled
+    // if ((LCDC & 0x01) == 0)
+    // return; // Background display is disabled
 
-    //     int tileMapBase = ((LCDC & 0x08) != 0) ? 0x9C00 : 0x9800;
-    //     int tileDataBase = ((LCDC & 0x10) != 0) ? 0x8000 : 0x8800;
+    // int tileMapBase = ((LCDC & 0x08) != 0) ? 0x9C00 : 0x9800;
+    // int tileDataBase = ((LCDC & 0x10) != 0) ? 0x8000 : 0x8800;
 
-    //     for (int x = 0; x < Screen.SCREEN_WIDTH; x++) {
-    //         int scrolledX = (x + SCX) & 0xFF;
-    //         int scrolledY = (LY + SCY) & 0xFF;
+    // for (int x = 0; x < Screen.SCREEN_WIDTH; x++) {
+    // int scrolledX = (x + SCX) & 0xFF;
+    // int scrolledY = (LY + SCY) & 0xFF;
 
-    //         int tileX = scrolledX / 8;
-    //         int tileY = scrolledY / 8;
+    // int tileX = scrolledX / 8;
+    // int tileY = scrolledY / 8;
 
-    //         int tileIndexAddr = tileMapBase + tileY * 32 + tileX;
-    //         int tileIndex = vRam.read(tileIndexAddr);
+    // int tileIndexAddr = tileMapBase + tileY * 32 + tileX;
+    // int tileIndex = vRam.read(tileIndexAddr);
 
-    //         if ((LCDC & 0x10) == 0) {
-    //             tileIndex = (byte) tileIndex; // Interpret tile index as signed (range -128 to 127)
-    //         }
+    // if ((LCDC & 0x10) == 0) {
+    // tileIndex = (byte) tileIndex; // Interpret tile index as signed (range -128
+    // to 127)
+    // }
 
-    //         // Fetch tile pixel row
-    //         int tileLine = scrolledY % 8;
-    //         int tileAddr = tileDataBase + tileIndex * 16 + tileLine * 2;
-    //         // int indexLow = tileAddr;
-    //         // int indexHigh = indexLow + 1;
+    // // Fetch tile pixel row
+    // int tileLine = scrolledY % 8;
+    // int tileAddr = tileDataBase + tileIndex * 16 + tileLine * 2;
+    // // int indexLow = tileAddr;
+    // // int indexHigh = indexLow + 1;
 
-    //         int low = vRam.read(tileAddr);
-    //         int high = vRam.read(tileAddr + 1);
+    // int low = vRam.read(tileAddr);
+    // int high = vRam.read(tileAddr + 1);
 
-    //         int bitIndex = 7 - (scrolledX % 8);
-    //         int bit0 = (low >> bitIndex) & 1;
-    //         int bit1 = (high >> bitIndex) & 1;
-    //         int colorId = (bit1 << 1) | bit0;
+    // int bitIndex = 7 - (scrolledX % 8);
+    // int bit0 = (low >> bitIndex) & 1;
+    // int bit1 = (high >> bitIndex) & 1;
+    // int colorId = (bit1 << 1) | bit0;
 
-    //         int color = bgPalette.getColor(colorId);
+    // int color = bgPalette.getColor(colorId);
 
-    //         int screenIndex = LY * Screen.SCREEN_WIDTH + x;
-    //         screen.writeOnScreen(screenIndex, color);
-    //     }
+    // int screenIndex = LY * Screen.SCREEN_WIDTH + x;
+    // screen.writeOnScreen(screenIndex, color);
+    // }
     // }
 
 }

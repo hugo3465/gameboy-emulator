@@ -34,6 +34,9 @@ public class VRAM extends RAM {
         return read(address);
     }
 
+    public static final int BACKGROUND_TILE_MAP_SIDE_LENGHT = 32;
+    public static final int BACKGROUND_TILE_MAP_SIZE = 1024; // 32 x 32
+    
     public int readBackgroundTileMap(int index) {
         return read(0x9800 + index);
     }
