@@ -34,15 +34,18 @@ public class TestPannel2 extends JPanel implements FrameObserver {
 
     @Override
     public void onFrameReady() {
-        if (currentDelayState == RE_RENDER_DELAY) {
-            currentDelayState = 0;
+        // Testar os dois mapas de background
+        boolean useSecondMap = false; // Trocar entre false (0x9800) e true (0x9C00)
+        int[] bgMapDebug = PPUUtils.debugBGMap(vram, useSecondMap);
 
-            int[] bgMap = PPUUtils.renderBackgroundTileMap(vram, palette);
-            image.setRGB(0, 0, image.getWidth(), image.getHeight(), bgMap, 0, image.getWidth());
-            repaint();
-        } else {
-            currentDelayState++;
+        // Definir o tamanho do image buffer se necessário
+        if (image.getWidth() != 256 || image.getHeight() != 256) {
+            image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
         }
+
+        // Mostrar o BGMap usando cores de debug
+        image.setRGB(0, 0, 256, 256, bgMapDebug, 0, 256);
+        repaint();
     }
 
     @Override

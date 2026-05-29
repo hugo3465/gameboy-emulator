@@ -2,7 +2,7 @@ package gb_emu.core.cpu;
 
 public class CPURegisters {
     private static final int STACK_POINTER_INITIAL_ADDRESS = 0xfffe;
-    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0000; // start at 0x0100
+    private static final int PROGRAM_COUNTER_INITIAL_ADDRESS = 0x0100; // start at 0x0100
     private static final int AF_INITIAL_ADDRESS = 0x01b0;
     private static final int BC_INITIAL_ADDRESS = 0x0013;
     private static final int DE_INITIAL_ADDRESS = 0x00d8;

@@ -18,6 +18,9 @@ public class CPU implements Serializable {
     private boolean enableInterruptsNextInstruction = false;
     private boolean interruptsEnabled = true;
 
+    // TODO remove, For debug purposes
+    private boolean chegou = false;
+
     public CPU(MMU mmu, CPURegisters registers) {
         this.mmu = mmu;
         this.registers = registers;
@@ -68,6 +71,17 @@ public class CPU implements Serializable {
 
         LOGGER.debug("PC: " + String.format("0x%04X", registers.getPC()));
 
+        // TODO remove, for debug purposes
+        if(
+            registers.getPC() == 0x20B2
+        ) {
+            chegou = true;
+            System.out.println("Cheguei");
+        }
+        if (chegou == true) {
+            return instructionsMap.execute(opcode, isPrefixCbInstruction);
+        }
+        
         return instructionsMap.execute(opcode, isPrefixCbInstruction);
     }
 

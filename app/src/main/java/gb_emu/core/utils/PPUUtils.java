@@ -61,4 +61,53 @@ public class PPUUtils {
 
         return screenBuffer;
     }
+
+    /**
+     * Debug method to render raw BGMap contents directly from VRAM
+     * 
+     * @param vRam         VRAM instance
+     * @param useSecondMap true to use map at 0x9C00, false for map at 0x9800
+     * @return RGB array for direct display
+     */
+    public static int[] debugBGMap(VRAM vRam, boolean useSecondMap) {
+        int mapBase = useSecondMap ? 0x9C00 : 0x9800;
+        int[] result = new int[32 * 32 * 8 * 8]; // 256x256 pixels
+
+        // For visualization - different colors for different values
+        int[] debugColors = new int[256]; // One color per possible tile index
+        for (int i = 0; i < 256; i++) {
+            // Generate a unique color for each tile index
+            int r = (i & 0x07) * 32;
+            int g = ((i >> 3) & 0x07) * 32;
+            int b = ((i >> 6) & 0x03) * 64;
+            debugColors[i] = (r << 16) | (g << 8) | b;
+        }
+
+        // Loop through the entire BGMap
+        for (int y = 0; y < 32; y++) {
+            for (int x = 0; x < 32; x++) {
+                int mapIndex = y * 32 + x;
+                int tileIndex = vRam.read(mapBase + mapIndex) & 0xFF; // Get tile index from map
+
+                // Fill this 8x8 area with the debug color for this tile index
+                for (int py = 0; py < 8; py++) {
+                    for (int px = 0; px < 8; px++) {
+                        int screenX = x * 8 + px;
+                        int screenY = y * 8 + py;
+                        int screenIndex = screenY * 256 + screenX;
+
+                        if (screenIndex < result.length) {
+                            result[screenIndex] = debugColors[tileIndex];
+                        }
+                    }
+                }
+
+                // Opcional: Desenhar número do tile no centro da área
+                // Isso exigiria mais código para renderizar texto, então omitimos por
+                // simplicidade
+            }
+        }
+
+        return result;
+    }
 }
