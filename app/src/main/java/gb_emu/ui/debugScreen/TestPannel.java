@@ -25,7 +25,7 @@ public class TestPannel extends JPanel implements FrameObserver {
 
     @Override
     public void onFrameReady() {
-        int[] tile1Data = vram.getTile(0x8000);
+        int[] tile1Data = vram.getTile(0x8000); // first tile address
         int[] tile1Frame = PPUUtils.processTileData(tile1Data, palette);
 
         tile1.setRGB(0, 0, 8, 8, tile1Frame, 0, 8);

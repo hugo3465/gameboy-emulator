@@ -72,16 +72,17 @@ public class CPU implements Serializable {
         LOGGER.debug("PC: " + String.format("0x%04X", registers.getPC()));
 
         // TODO remove, for debug purposes
-        if(
-            registers.getPC() == 0x20B2
-        ) {
-            chegou = true;
-            System.out.println("Cheguei");
-        }
-        if (chegou == true) {
-            return instructionsMap.execute(opcode, isPrefixCbInstruction);
-        }
-        
+            if(
+                registers.getPC() == 0x20B2
+            ) {
+                chegou = true;
+                System.out.println("Cheguei");
+            }
+            if (chegou == true) {
+                return instructionsMap.execute(opcode, isPrefixCbInstruction);
+            }
+        // debug ends here
+
         return instructionsMap.execute(opcode, isPrefixCbInstruction);
     }
 

@@ -47,10 +47,10 @@ public class Cartridge implements Serializable {
         try (FileInputStream fis = new FileInputStream(file)) {
             int bytesRead = fis.read(data);
             if (bytesRead != data.length) {
-                throw new IOException("Error while reading the ROM file.");
+                throw new IOException("Error while reading the ROM file: readed bytes are diferent from data lenght");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error while reading the ROM file.");
+            throw new RuntimeException("Error while reading the ROM file:\n" + e.getMessage());
         }
 
         return data;
